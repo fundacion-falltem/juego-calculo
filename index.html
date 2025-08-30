@@ -1,0 +1,142 @@
+<!doctype html>
+<html lang="es-AR">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <meta name="description" content="Cálculo amable para personas mayores: sumas y restas sin tiempo, con teclado grande."/>
+  <meta name="theme-color" content="#0b0b0b"/>
+  <meta name="color-scheme" content="dark light"/>
+  <meta name="referrer" content="strict-origin-when-cross-origin"/>
+
+  <!-- CSP estricta (todo local) -->
+  <meta http-equiv="Content-Security-Policy"
+        content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self';
+                 img-src 'self' data:; connect-src 'self'; object-src 'none';
+                 base-uri 'none'; form-action 'none'">
+
+  <title>Cálculo amable — Juegos Cognitivos</title>
+  <link rel="stylesheet" href="./styles.css?v=1.0">
+</head>
+<body>
+  <a href="#juego" class="skip">Saltar directamente al juego</a>
+
+  <!-- FAB Ayuda -->
+  <div class="fixed-top-right">
+    <button id="aboutBtn" class="btn-fab" type="button"
+            aria-haspopup="dialog" aria-controls="aboutModal"
+            aria-expanded="false" aria-label="¿Por qué este juego?">?</button>
+  </div>
+
+  <!-- Modal ayuda -->
+  <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="aboutTitle">
+    <div class="modal-card" role="document">
+      <h2 id="aboutTitle" class="mt0">¿Por qué este juego?</h2>
+      <p>Ejercita <strong>cálculo básico</strong>, <strong>atención</strong> y <strong>memoria de trabajo</strong>.
+         No hay límite de tiempo; hacelo con calma.</p>
+      <ul>
+        <li>Sesiones cortas (5–10 min), 2–3 veces por semana.</li>
+        <li>Empezá en <strong>Fácil</strong> y subí cuando resulte cómodo.</li>
+        <li>Podés usar el teclado táctil grande o escribir con el teclado.</li>
+      </ul>
+      <p class="muted"><small>Actividad <strong>lúdica</strong>; no es práctica médica. No recolectamos datos personales.</small></p>
+      <div class="modal-actions">
+        <button id="aboutClose" class="btn principal" type="button">Entendido</button>
+      </div>
+    </div>
+  </div>
+
+  <main class="wrap" role="main" aria-labelledby="titulo">
+    <header class="header">
+      <h1 id="titulo">Cálculo amable</h1>
+      <p class="intro">Resolvé sumas y restas sin apuro. Un ejercicio simple para mantener activo el cálculo cotidiano.</p>
+    </header>
+
+    <!-- Controles -->
+    <section class="card" aria-label="Controles">
+      <div class="controles">
+        <div class="control">
+          <label for="operacion">Operación</label>
+          <select id="operacion" aria-label="Elegir tipo de operación">
+            <option value="suma" selected>Suma</option>
+            <option value="resta">Resta</option>
+            <option value="mixto">Mixto</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <label for="dificultad">Dificultad</label>
+          <select id="dificultad" aria-label="Elegir dificultad">
+            <option value="facil" selected>Fácil (0–10)</option>
+            <option value="medio">Medio (0–20)</option>
+            <option value="avanzado">Avanzado (0–50)</option>
+          </select>
+        </div>
+
+        <div class="control">
+          <label for="rondas">Rondas</label>
+          <select id="rondas" aria-label="Elegir número de rondas">
+            <option value="6">6</option>
+            <option value="8" selected>8</option>
+            <option value="10">10</option>
+          </select>
+        </div>
+
+        <div class="control buttons">
+          <button id="themeToggle" class="btn secundario" type="button">Cambiar tema</button>
+          <button id="btnComenzar" class="btn principal" type="button">Comenzar</button>
+          <button id="btnReiniciar" class="btn secundario" type="button" hidden>Volver a jugar</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Juego -->
+    <section id="juego" class="card juego" aria-live="polite">
+      <div class="progresoBar" aria-hidden="true"><div id="pbFill"></div></div>
+
+      <p class="enunciado" id="enunciado" aria-live="polite">Presioná “Comenzar” para iniciar.</p>
+
+      <div class="respuesta">
+        <label for="inputResp" class="sr-only">Respuesta</label>
+        <input id="inputResp" type="number" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
+               aria-label="Ingresar respuesta" placeholder="Respuesta…" disabled />
+        <button id="btnComprobar" class="btn principal" type="button" disabled>Comprobar</button>
+      </div>
+
+      <!-- Teclado táctil grande -->
+      <div class="teclado" aria-hidden="false">
+        <button data-n="7">7</button>
+        <button data-n="8">8</button>
+        <button data-n="9">9</button>
+        <button data-n="4">4</button>
+        <button data-n="5">5</button>
+        <button data-n="6">6</button>
+        <button data-n="1">1</button>
+        <button data-n="2">2</button>
+        <button data-n="3">3</button>
+        <button data-n="0" class="cero">0</button>
+        <button data-act="borrar" class="sec">Borrar</button>
+        <button data-act="enviar" class="ok">✔</button>
+      </div>
+
+      <p id="feedback" class="feedback muted" role="status" aria-live="polite" aria-atomic="true"></p>
+    </section>
+
+    <!-- Estado -->
+    <section class="card estado" role="status" aria-live="polite" aria-atomic="true">
+      <p>Progreso: <strong id="progTxt">0/0</strong> · Aciertos: <strong id="aciertos">0</strong></p>
+    </section>
+
+    <footer class="mini-credit" role="contentinfo" aria-label="Créditos y aviso">
+      <p>
+        <strong class="mini-label">Créditos y aviso:</strong>
+        Desarrollado para <a href="https://falltem.org/" target="_blank" rel="noopener">FALLTEM</a>
+        • Código abierto (MIT) • Actividad lúdica; no es práctica médica
+        <br><small>Versión: <strong id="versionLabel"></strong></small>
+      </p>
+    </footer>
+  </main>
+
+  <noscript><p style="margin:1rem">Este juego necesita JavaScript para funcionar.</p></noscript>
+  <script src="./app.js?v=1.0" defer></script>
+</body>
+</html>
