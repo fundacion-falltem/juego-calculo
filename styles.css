@@ -163,3 +163,65 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
   *{ scroll-behavior:auto }
   #pbFill{ transition:none }
 }
+
+/* ===== Opciones (botones grandes) ===== */
+.opciones{
+  display:grid;
+  grid-template-columns: 1fr;
+  gap:.7rem;
+  margin-top:.4rem;
+}
+@media (min-width: 700px){
+  .opciones{ grid-template-columns: 1fr 1fr; }
+}
+.opcion-btn{
+  text-align:left;
+  background: var(--card);
+  color: var(--fg);
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  padding: 1rem 1.1rem;
+  font-size: clamp(1.05rem, 0.6vw + 1rem, 1.25rem);
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0,0,0,.08);
+  transition: transform .15s ease, filter .15s ease, border-color .15s ease;
+}
+.opcion-btn strong{ margin-right: .4rem }
+.opcion-btn:hover,
+.opcion-btn:focus-visible{
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+.opcion-btn.ok{
+  border-color: var(--ok);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ok) 35%, transparent);
+  background: color-mix(in oklab, var(--ok) 14%, var(--card));
+}
+.opcion-btn.bad{
+  border-color: var(--bad);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--bad) 35%, transparent);
+  background: color-mix(in oklab, var(--bad) 10%, var(--card));
+}
+
+/* ===== Tiempo por pregunta ===== */
+.timer-text{
+  margin: .3rem 0 .2rem;
+  font-weight: 800;
+  opacity: .9;
+}
+.timerBar{
+  height: 8px;
+  background: color-mix(in oklab, var(--border) 80%, transparent);
+  border-radius: 999px;
+  overflow: hidden;
+  margin-bottom: .6rem;
+}
+#timerFill{
+  height: 100%;
+  width: 0%;
+  background: var(--btn-sec-bg);
+  transition: width .12s linear;
+}

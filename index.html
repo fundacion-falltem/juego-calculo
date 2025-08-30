@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="description" content="Cálculo amable para personas mayores: sumas y restas sin tiempo, con teclado grande."/>
+  <meta name="description" content="Cálculo amable para personas mayores: sumas y restas sin tiempo, con opciones grandes."/>
   <meta name="theme-color" content="#0b0b0b"/>
   <meta name="color-scheme" content="dark light"/>
   <meta name="referrer" content="strict-origin-when-cross-origin"/>
@@ -15,7 +15,7 @@
                  base-uri 'none'; form-action 'none'">
 
   <title>Cálculo amable — Juegos Cognitivos</title>
-  <link rel="stylesheet" href="./styles.css?v=1.0">
+  <link rel="stylesheet" href="./styles.css?v=1.1">
 </head>
 <body>
   <a href="#juego" class="skip">Saltar directamente al juego</a>
@@ -36,7 +36,7 @@
       <ul>
         <li>Sesiones cortas (5–10 min), 2–3 veces por semana.</li>
         <li>Empezá en <strong>Fácil</strong> y subí cuando resulte cómodo.</li>
-        <li>Podés usar el teclado táctil grande o escribir con el teclado.</li>
+        <li>Podés responder con botones grandes o con las teclas <strong>1–4</strong>.</li>
       </ul>
       <p class="muted"><small>Actividad <strong>lúdica</strong>; no es práctica médica. No recolectamos datos personales.</small></p>
       <div class="modal-actions">
@@ -48,7 +48,7 @@
   <main class="wrap" role="main" aria-labelledby="titulo">
     <header class="header">
       <h1 id="titulo">Cálculo amable</h1>
-      <p class="intro">Resolvé sumas y restas sin apuro. Un ejercicio simple para mantener activo el cálculo cotidiano.</p>
+      <p class="intro">Resolvé sumas y restas sin apuro. Elegí la respuesta correcta.</p>
     </header>
 
     <!-- Controles -->
@@ -89,37 +89,22 @@
       </div>
     </section>
 
-    <!-- Juego -->
+    <!-- Juego por opciones -->
     <section id="juego" class="card juego" aria-live="polite">
       <div class="progresoBar" aria-hidden="true"><div id="pbFill"></div></div>
 
       <p class="enunciado" id="enunciado" aria-live="polite">Presioná “Comenzar” para iniciar.</p>
 
-      <div class="respuesta">
-        <label for="inputResp" class="sr-only">Respuesta</label>
-        <input id="inputResp" type="number" inputmode="numeric" pattern="[0-9]*" autocomplete="off"
-               aria-label="Ingresar respuesta" placeholder="Respuesta…" disabled />
-        <button id="btnComprobar" class="btn principal" type="button" disabled>Comprobar</button>
-      </div>
-
-      <!-- Teclado táctil grande -->
-      <div class="teclado" aria-hidden="false">
-        <button data-n="7">7</button>
-        <button data-n="8">8</button>
-        <button data-n="9">9</button>
-        <button data-n="4">4</button>
-        <button data-n="5">5</button>
-        <button data-n="6">6</button>
-        <button data-n="1">1</button>
-        <button data-n="2">2</button>
-        <button data-n="3">3</button>
-        <button data-n="0" class="cero">0</button>
-        <button data-act="borrar" class="sec">Borrar</button>
-        <button data-act="enviar" class="ok">✔</button>
+      <div id="opciones" class="opciones" role="group" aria-labelledby="enunciado">
+        <!-- Botones se generan por JS -->
       </div>
 
       <p id="feedback" class="feedback muted" role="status" aria-live="polite" aria-atomic="true"></p>
     </section>
+
+        <!-- Marcador de tiempo por pregunta -->
+    <p id="timerText" class="timer-text" role="status" aria-live="polite" aria-atomic="true"></p>
+    <div class="timerBar" aria-hidden="true"><div id="timerFill"></div></div>
 
     <!-- Estado -->
     <section class="card estado" role="status" aria-live="polite" aria-atomic="true">
@@ -137,6 +122,6 @@
   </main>
 
   <noscript><p style="margin:1rem">Este juego necesita JavaScript para funcionar.</p></noscript>
-  <script src="./app.js?v=1.0" defer></script>
+  <script src="./app.js?v=1.1" defer></script>
 </body>
 </html>
