@@ -225,3 +225,33 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
   background: var(--btn-sec-bg);
   transition: width .12s linear;
 }
+
+/* Timer en modo alerta */
+#timer.alerta {
+  color: var(--bad);        /* rojo de tu paleta */
+  font-weight: 800;
+  animation: pulse 0.8s infinite;
+}
+
+@keyframes pulse {
+  0%   { transform: scale(1); }
+  50%  { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Timer alerta (≤3s) */
+.timer-alert {
+  color: var(--bad);
+  font-weight: 800;
+}
+#timerFill.timer-alert { background: var(--bad); }
+
+/* pequeño pulso si no se reduce motion */
+@media (prefers-reduced-motion: no-preference) {
+  .timer-pulse { animation: pulse .8s infinite; }
+  @keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+}

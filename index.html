@@ -3,19 +3,19 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="description" content="Cálculo amable para personas mayores: sumas y restas sin tiempo, con opciones grandes."/>
+  <meta name="description" content="Cálculo amable para personas mayores: sumas y restas con opciones grandes y tiempo por pregunta."/>
   <meta name="theme-color" content="#0b0b0b"/>
   <meta name="color-scheme" content="dark light"/>
   <meta name="referrer" content="strict-origin-when-cross-origin"/>
 
-  <!-- CSP estricta (todo local) -->
+  <!-- CSP estricta: nada inline -->
   <meta http-equiv="Content-Security-Policy"
         content="default-src 'self'; script-src 'self'; style-src 'self'; font-src 'self';
                  img-src 'self' data:; connect-src 'self'; object-src 'none';
                  base-uri 'none'; form-action 'none'">
 
   <title>Cálculo amable — Juegos Cognitivos</title>
-  <link rel="stylesheet" href="./styles.css?v=1.1">
+  <link rel="stylesheet" href="./styles.css?v=1.2.2">
 </head>
 <body>
   <a href="#juego" class="skip">Saltar directamente al juego</a>
@@ -31,12 +31,12 @@
   <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="aboutTitle">
     <div class="modal-card" role="document">
       <h2 id="aboutTitle" class="mt0">¿Por qué este juego?</h2>
-      <p>Ejercita <strong>cálculo básico</strong>, <strong>atención</strong> y <strong>memoria de trabajo</strong>.
-         No hay límite de tiempo; hacelo con calma.</p>
+      <p>Ejercita <strong>cálculo básico</strong>, <strong>atención</strong> y <strong>velocidad de procesamiento</strong>.
+         No hay límite de sesiones; hacelo con calma.</p>
       <ul>
         <li>Sesiones cortas (5–10 min), 2–3 veces por semana.</li>
         <li>Empezá en <strong>Fácil</strong> y subí cuando resulte cómodo.</li>
-        <li>Podés responder con botones grandes o con las teclas <strong>1–4</strong>.</li>
+        <li>Respondé con botones grandes o con las teclas <strong>A–D</strong>.</li>
       </ul>
       <p class="muted"><small>Actividad <strong>lúdica</strong>; no es práctica médica. No recolectamos datos personales.</small></p>
       <div class="modal-actions">
@@ -91,20 +91,24 @@
 
     <!-- Juego por opciones -->
     <section id="juego" class="card juego" aria-live="polite">
+      <!-- Progreso global de rondas -->
       <div class="progresoBar" aria-hidden="true"><div id="pbFill"></div></div>
 
+      <!-- Tiempo por pregunta -->
+      <p id="timerText" class="timer-text" role="status" aria-live="polite" aria-atomic="true"></p>
+      <div class="timerBar" aria-hidden="true"><div id="timerFill"></div></div>
+
+      <!-- Enunciado -->
       <p class="enunciado" id="enunciado" aria-live="polite">Presioná “Comenzar” para iniciar.</p>
 
+      <!-- Opciones A–D -->
       <div id="opciones" class="opciones" role="group" aria-labelledby="enunciado">
-        <!-- Botones se generan por JS -->
+        <!-- Se generan por JS -->
       </div>
 
+      <!-- Feedback -->
       <p id="feedback" class="feedback muted" role="status" aria-live="polite" aria-atomic="true"></p>
     </section>
-
-        <!-- Marcador de tiempo por pregunta -->
-    <p id="timerText" class="timer-text" role="status" aria-live="polite" aria-atomic="true"></p>
-    <div class="timerBar" aria-hidden="true"><div id="timerFill"></div></div>
 
     <!-- Estado -->
     <section class="card estado" role="status" aria-live="polite" aria-atomic="true">
@@ -114,7 +118,7 @@
     <footer class="mini-credit" role="contentinfo" aria-label="Créditos y aviso">
       <p>
         <strong class="mini-label">Créditos y aviso:</strong>
-        Desarrollado por <a href="https://falltem.org/" target="_blank" rel="noopener">FALLTEM</a>
+        Desarrollado para <a href="https://falltem.org/" target="_blank" rel="noopener">FALLTEM</a>
         • Código abierto (MIT) • Actividad lúdica; no es práctica médica
         <br><small>Versión: <strong id="versionLabel"></strong></small>
       </p>
@@ -122,6 +126,6 @@
   </main>
 
   <noscript><p style="margin:1rem">Este juego necesita JavaScript para funcionar.</p></noscript>
-  <script src="./app.js?v=1.1" defer></script>
+  <script src="./app.js?v=1.2.2" defer></script>
 </body>
 </html>
