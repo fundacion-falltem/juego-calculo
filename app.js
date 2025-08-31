@@ -1,7 +1,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const VERSION = "v1.2.2 (opciones + timer + alerta)";
+  const VERSION = "v1.2.3 (opciones + timer + alerta + mixto balanceado)";
   const versionEl = document.getElementById('versionLabel');
   if (versionEl) versionEl.textContent = VERSION;
 
@@ -29,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Timer
   const timerText = document.getElementById('timerText');
   const timerFill = document.getElementById('timerFill');
+  const timerBar  = document.querySelector('.timerBar');
 
   // ===== Estado
   let rondasTotales = 8, ronda = 0, aciertos = 0;
@@ -36,10 +37,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let dificultad = 'facil';
   let respuestaCorrecta = null;
 
+  // control de “mixto”
+  let lastOpUsed = null;
+  let sameOpStreak = 0;
+
   // Timer estado
   let timerId = null;
-  let timeLeft = 0;  // ms restantes
-  let timeMax  = 0;  // ms por pregunta
+  let timeLeft = 0;  // ms
+  let timeMax  = 0;  // ms
 
   // ===== Utils
   const rand = (min, max) => Math.floor(Math.random()*(max-min+1)) + min;
@@ -56,11 +61,23 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dificultad === 'medio') return 10000; // 10 s
     return 7000;                              // 7 s
   }
+
   function elegirOperacion(){
-    if (operacion === 'mixto'){
-      return Math.random() < 0.5 ? 'suma' : 'resta';
+    if (operacion !== 'mixto') return operacion;
+
+    let pick = Math.random() < 0.5 ? 'suma' : 'resta';
+    // Evitar 3 seguidas del mismo tipo
+    if (lastOpUsed === pick && sameOpStreak >= 2){
+      pick = (pick === 'suma') ? 'resta' : 'suma';
     }
-    return operacion;
+    // Actualizar racha
+    if (lastOpUsed === pick){
+      sameOpStreak++;
+    } else {
+      sameOpStreak = 1;
+      lastOpUsed = pick;
+    }
+    return pick;
   }
 
   function generarDistractores(correcta, min, max){
@@ -82,7 +99,16 @@ document.addEventListener('DOMContentLoaded', () => {
     return result;
   }
 
-  // ===== Timer
+  // ===== Timer helpers
+  function showTimer(){
+    if (timerText){ timerText.style.display = ''; timerText.setAttribute('aria-hidden','false'); }
+    if (timerBar){ timerBar.style.display = ''; timerBar.setAttribute('aria-hidden','true'); }
+  }
+  function hideTimer(){
+    if (timerText){ timerText.style.display = 'none'; timerText.setAttribute('aria-hidden','true'); }
+    if (timerBar){ timerBar.style.display = 'none'; timerBar.setAttribute('aria-hidden','true'); }
+  }
+
   function stopTimer(){
     if (timerId){ clearInterval(timerId); timerId = null; }
   }
@@ -105,7 +131,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
   }
   function updateTimerUI(){
-    // Texto
+    // texto
     if (timerText){
       const s = Math.ceil(timeLeft / 1000);
       setTxt(timerText, s > 0 ? `Tiempo: ${s} s` : 'Tiempo: 0 s');
@@ -114,7 +140,7 @@ document.addEventListener('DOMContentLoaded', () => {
       timerText.classList.toggle('timer-pulse', alerta);
       if (alerta && navigator.vibrate) navigator.vibrate(40);
     }
-    // Barra
+    // barra
     if (timerFill && timeMax > 0){
       const pct = Math.max(0, Math.min(100, Math.round((timeLeft / timeMax) * 100)));
       timerFill.style.width = pct + '%';
@@ -169,6 +195,7 @@ document.addEventListener('DOMContentLoaded', () => {
     actualizarUI();
 
     // tiempo por pregunta
+    showTimer();
     startTimer(tiempoPorDificultad());
   }
 
@@ -215,6 +242,8 @@ document.addEventListener('DOMContentLoaded', () => {
       btnReiniciar.hidden = false;
       btnComenzar.hidden = true;
       actualizarUI();
+
+      hideTimer();
       setTxt(timerText, '');
       if (timerFill) timerFill.style.width = '0%';
     } else {
@@ -235,6 +264,8 @@ document.addEventListener('DOMContentLoaded', () => {
       btnReiniciar.hidden = false;
       btnComenzar.hidden = true;
       actualizarUI();
+
+      hideTimer();
       setTxt(timerText, '');
       if (timerFill) timerFill.style.width = '0%';
     } else {
@@ -277,6 +308,7 @@ document.addEventListener('DOMContentLoaded', () => {
     ronda = 0; aciertos = 0;
     actualizarUI();
 
+    hideTimer();
     setTxt(timerText, '');
     if (timerFill) timerFill.style.width = '0%';
   });
@@ -331,4 +363,5 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ===== Init
   actualizarUI();
+  hideTimer(); // oculto timer hasta que arranque el juego
 });

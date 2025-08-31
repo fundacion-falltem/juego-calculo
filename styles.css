@@ -255,3 +255,10 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
     100% { transform: scale(1); }
   }
 }
+
+
+/* Aire extra en móvil entre enunciado y opciones */
+@media (max-width: 600px){
+  .enunciado{ margin-bottom: 1rem; }
+  .opciones{ gap: .9rem; }
+}
