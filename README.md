@@ -67,7 +67,7 @@ Este proyecto se distribuye bajo licencia **MIT** (ver `LICENSE.txt`).
 ---
 
 ## 🙌 Créditos
-Desarrollado originalmente para **FALLTEM**  
+Desarrollado originalmente para uso de **FALLTEM**  
 Sitio: [https://falltem.org/](https://falltem.org/)
 
 **Reutilización por otras ONG:**  
@@ -75,4 +75,4 @@ El código se publica con **Licencia MIT**.
 Esto significa que cualquier organización puede usarlo, copiarlo, modificarlo y redistribuirlo, siempre que conserve el aviso de copyright y la licencia.
 
 **Atribución sugerida (no obligatoria):**  
-“Basado en el proyecto *Juegos Cognitivos* (MIT), desarrollado originalmente para [FALLTEM](https://falltem.org/).”
+“Basado en el proyecto *Juegos Cognitivos* (MIT), desarrollado originalmente para uso de [FALLTEM](https://falltem.org/).”

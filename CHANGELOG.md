@@ -1,4 +1,6 @@
 # 📌 Changelog — Juego "Cálculo amable"
+## [v1.3] — 2025-08-31
+- Versión estable con sistema de tiempo, feedback visual y mejoras de usabilidad
 
 ## [v1.2] — 2025-08-30
 ### Mejorado
