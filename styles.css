@@ -227,12 +227,20 @@ select{
 
 /* ===== Footer ===== */
 .mini-credit{
-  margin-top:.6rem; padding:.4rem 0; border-top:1px solid var(--border);
-  font-size:.85em; line-height:1.35; color:var(--muted);
-  max-width: 980px; margin-inline:auto;
+  margin-top:.6rem;
+  padding:.4rem 0;
+  border-top:1px solid var(--border);
+  font-size:.65em;
+  line-height:1.35;
+  color:var(--muted);
+
+  max-width:980px;
+  margin-inline:auto;
+  display:flex;             /* centra incluso si hay varios nodos hijos */
+  flex-direction:column;
+  align-items:center;       /* centra horizontalmente los hijos */
+  text-align:center;        /* centra el texto de cada hijo */
 }
-.mini-credit a{ color:inherit; text-decoration:underline; font-weight:700 }
-.mini-label{ font-weight:900; color:var(--fg) }
 
 /* ===== Skip link ===== */
 .skip{ position:absolute; left:-9999px; top:auto }
