@@ -365,3 +365,4 @@ document.addEventListener('DOMContentLoaded', () => {
   actualizarUI();
   hideTimer(); // oculto timer hasta que arranque el juego
 });
+
