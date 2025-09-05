@@ -1,9 +1,12 @@
 /* ======================================================
    FALLTEM — Cálculo amable (web + mobile)
-   Limpio y unificado
+   Versión mejorada (secciones ordenadas)
    ====================================================== */
 
-/* ===== Variables de tema ===== */
+
+/* ======================================================
+   1) VARIABLES / TEMA
+   ====================================================== */
 :root{
   color-scheme: light dark;
   --fs-base: clamp(18px, 1.05vw + 14px, 22px);
@@ -21,7 +24,7 @@
   --ok:#16a34a; --bad:#dc2626;
 }
 [data-theme="light"]{
-  --bg:#f8fbf4; --fg:#1b1b1b; --muted:#50380b;
+  --bg:#f8fbf4; --fg:#1b1b1b; --muted:#374151; /* más legible en light */
   --card:#ffffff; --border:#e5e7eb; --focus:#5fcbe0;
 
   /* FABs con fondo oscuro y texto CLARO */
@@ -32,7 +35,10 @@
   text-shadow: 0 1px 1px rgba(0,0,0,.35);
 }
 
-/* ===== Base ===== */
+
+/* ======================================================
+   2) BASE / LAYOUT
+   ====================================================== */
 *{ box-sizing:border-box }
 html,body{ height:100% }
 html{ -webkit-text-size-adjust:100%; text-size-adjust:100% }
@@ -47,7 +53,10 @@ body{
 .header h1{ font-size: clamp(2rem, 1.4vw + 1.6rem, 2.6rem); margin:.4rem 0 0; font-weight:900; letter-spacing:.2px }
 .intro{ margin:.5rem 0 var(--space) }
 
-/* ===== Tarjeta ===== */
+
+/* ======================================================
+   3) TARJETA / CONTENEDORES
+   ====================================================== */
 .card{
   background: var(--card);
   border: 1px solid var(--border);
@@ -58,7 +67,10 @@ body{
   box-shadow: 0 2px 10px rgba(0,0,0,.06);
 }
 
-/* ===== Controles ===== */
+
+/* ======================================================
+   4) CONTROLES (selects + botones de cabecera)
+   ====================================================== */
 .controles{
   display:grid;
   grid-template-columns: 1fr;
@@ -82,7 +94,10 @@ select{
   justify-content:center; align-items:center;
 }
 
-/* ===== Botón base ===== */
+
+/* ======================================================
+   5) BOTONES (base)
+   ====================================================== */
 .btn{
   border:0; border-radius:14px; cursor:pointer; font-weight:900;
   padding:.95rem 1.2rem; min-height:50px; font-size:1.06rem;
@@ -93,7 +108,10 @@ select{
 .btn.principal{ background:var(--btn-primary-bg); color:var(--btn-primary-fg) }
 .btn.secundario{ background:var(--btn-sec-bg); color:var(--btn-sec-fg) }
 
-/* --- Desktop: botones parejos y centrados --- */
+
+/* ======================================================
+   6) RESPONSIVE DE CONTROLES
+   ====================================================== */
 @media (min-width: 900px){
   .controles{
     grid-template-columns: repeat(3, minmax(220px, 1fr));
@@ -106,64 +124,141 @@ select{
   .control.buttons .btn{ min-width: 220px; }
 }
 
-/* ===== Juego ===== */
+
+/* ======================================================
+   7) JUEGO — SECCIÓN CENTRAL
+   ====================================================== */
+
+/* Tarjeta de la práctica: más protagonista y estrecha */
+.juego .card{
+  padding: clamp(16px, 2.6vw, 28px);
+  max-width: 720px;
+  margin-inline: auto;
+}
+
+/* Meta (tiempo / ronda) cerca del enunciado */
+.juego .meta{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:800;
+  margin:.2rem 0 .4rem;
+  opacity:.9;
+}
+
+/* Barra de progreso general */
 .juego .progresoBar{
   height:10px; background: color-mix(in oklab, var(--border) 80%, transparent);
   border-radius:999px; overflow:hidden; margin-bottom:.9rem;
 }
 #pbFill{ height:100%; width:0%; background:var(--btn-primary-bg); transition: width .25s ease }
 
+/* Enunciado más jerárquico y centrado */
 .enunciado{
-  font-size: clamp(1.35rem, 1.1vw + 1.1rem, 1.9rem);
-  font-weight:900; margin:.2rem 0 .9rem;
-  letter-spacing:.2px;
+  font-size: clamp(2rem, 2.2vw + 1.2rem, 3rem);
+  font-weight:900;
+  text-align:center;
+  letter-spacing:0;
+  margin:.4rem 0 1.1rem;
 }
 
 /* Opciones múltiples (A–D) */
 .opciones{
-  display:grid; grid-template-columns: 1fr; gap:.8rem; margin-top:.6rem;
+  display:grid; grid-template-columns: 1fr; gap:1rem; margin-top:.6rem;
 }
 @media (min-width: 700px){
   .opciones{ grid-template-columns: 1fr 1fr; }
 }
 .opcion-btn{
-  text-align:left; background:var(--card); color:var(--fg);
-  border:2px solid var(--border); border-radius: 12px;
+  text-align:left;
+  display:flex; align-items:center; gap:.6rem;
+  background:var(--card); color:var(--fg);
+  border:2px solid var(--border); border-radius: 14px;
   padding:1rem 1.1rem; font-weight:800; font-size: clamp(1.05rem, 0.6vw + 1rem, 1.25rem);
   cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.08);
-  transition: transform .15s ease, filter .15s ease, border-color .15s ease;
+  transition: transform .12s ease, filter .15s ease, border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
 }
 .opcion-btn strong{ margin-right:.4rem }
-.opcion-btn:hover, .opcion-btn:focus-visible{
-  filter:brightness(1.06); transform:translateY(-1px);
-  outline:3px solid var(--focus); outline-offset:2px;
+.opcion-btn:hover{ filter:brightness(1.06); transform:translateY(-1px); }
+.opcion-btn:active{ transform: translateY(0); }
+
+/* foco accesible y consistente */
+.opcion-btn:focus-visible{
+  outline:none;
+  border-color:var(--focus);
+  box-shadow:0 0 0 3px color-mix(in oklab, var(--focus) 45%, transparent);
 }
+
+/* Estado seleccionado previo al veredicto */
+.opcion-btn.is-selected{
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--focus) 35%, transparent);
+  background: color-mix(in oklab, var(--focus) 10%, var(--card));
+}
+
+/* Feedback final (ok/bad) */
 .opcion-btn.ok{
   border-color:var(--ok);
   box-shadow:0 0 0 3px color-mix(in oklab, var(--ok) 35%, transparent);
-  background: color-mix(in oklab, var(--ok) 14%, var(--card));
+  background: color-mix(in oklab, var(--ok) 12%, var(--card));
 }
 .opcion-btn.bad{
   border-color:var(--bad);
   box-shadow:0 0 0 3px color-mix(in oklab, var(--bad) 35%, transparent);
-  background: color-mix(in oklab, var(--bad) 10%, var(--card));
+  background: color-mix(in oklab, var(--bad) 8%, var(--card));
 }
 
-/* ===== Timer ===== */
+
+/* ======================================================
+   8) TIMER
+   ====================================================== */
 .timer-text{ margin:.35rem 0 .25rem; font-weight:800; opacity:.95 }
 .timerBar{
   height:8px; background: color-mix(in oklab, var(--border) 80%, transparent);
   border-radius:999px; overflow:hidden; margin-bottom:.6rem;
 }
-#timerFill{ height:100%; width:0%; background: var(--btn-sec-bg); transition: width .12s linear }
+/* degradé de urgencia según data-level: normal|warn|alert */
+#timerFill{
+  height:100%; width:0%;
+  background: var(--btn-sec-bg);
+  transition: width .10s linear, background-color .15s ease;
+}
+#timerFill[data-level="warn"]  { background:#f59e0b; }
+#timerFill[data-level="alert"] { background:var(--bad); }
 .timer-alert{ color: var(--bad); font-weight:900 }
-#timerFill.timer-alert{ background: var(--bad) }
 @media (prefers-reduced-motion: no-preference){
   .timer-pulse{ animation: pulse .8s ease-in-out infinite }
   @keyframes pulse{ 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
 }
 
-/* ===== FABs (ayuda + tema) arriba derecha ===== */
+
+/* ======================================================
+   9) MENSAJES / FEEDBACK FINAL
+   ====================================================== */
+.feedback{
+  margin-top: .8rem;
+  font-weight: 800;
+}
+.feedback.ok{ color: var(--ok); }
+.feedback.bad{ color: var(--bad); }
+.feedback.muted{ color: var(--muted); }
+
+
+/* ======================================================
+   10) CTAs (acciones al final de sesión)
+   ====================================================== */
+.cta-buttons{
+  display: flex;
+  flex-wrap: wrap;
+  gap: .6rem;
+  margin-top: 1rem;
+  justify-content: center;
+}
+
+
+/* ======================================================
+   11) FABs (AYUDA + TEMA)
+   ====================================================== */
 .fixed-top-right{
   position: fixed;
   top: calc(12px + env(safe-area-inset-top, 0px));
@@ -192,7 +287,7 @@ select{
   font-size:0; /* ocultar texto si lo hubiese */
 }
 .btn-theme:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
-/* Icono según tema (sin “circulito” del emoji; usamos el fondo del botón) */
+/* Icono según tema */
 [data-theme="light"] .btn-theme::before{
   content:"🌙"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35));
 }
@@ -200,7 +295,10 @@ select{
   content:"☀️"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35));
 }
 
-/* ===== Modal ===== */
+
+/* ======================================================
+   12) MODAL
+   ====================================================== */
 .modal[hidden]{ display:none !important; }
 .modal{
   position:fixed; inset:0;
@@ -218,7 +316,10 @@ select{
 }
 .modal-actions{ display:flex; gap:10px; justify-content:flex-end }
 
-/* ===== Footer ===== */
+
+/* ======================================================
+   13) FOOTER
+   ====================================================== */
 .mini-credit{
   margin-top:.6rem; padding:.4rem 0;
   border-top:1px solid var(--border);
@@ -227,7 +328,10 @@ select{
   display:flex; flex-direction:column; align-items:center; text-align:center;
 }
 
-/* ===== Accesibilidad ===== */
+
+/* ======================================================
+   14) ACCESIBILIDAD / PREFERENCIAS
+   ====================================================== */
 .skip{ position:absolute; left:-9999px; top:auto }
 .skip:focus{
   left:12px; top:12px; background:var(--btn-primary-bg); color:var(--btn-primary-fg);
@@ -243,4 +347,3 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
   *{ scroll-behavior:auto }
   #pbFill{ transition:none }
 }
-
