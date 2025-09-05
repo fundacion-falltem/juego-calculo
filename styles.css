@@ -1,30 +1,35 @@
 /* ======================================================
-   FALLTEM — Cálculo amable (web + mobile pulido)
-   - Desktop: controles en fila, botones centrados y parejos
-   - Mobile: mantiene la grilla actual
-   - Tema claro/oscuro compatibles con los otros juegos
+   FALLTEM — Cálculo amable (web + mobile)
+   Limpio y unificado
    ====================================================== */
 
+/* ===== Variables de tema ===== */
 :root{
   color-scheme: light dark;
   --fs-base: clamp(18px, 1.05vw + 14px, 22px);
   --space: clamp(12px, 1vw + 8px, 18px);
   --font: "Montserrat", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
 
-  /* Neutros dark (compat) */
+  /* Neutros (modo oscuro por defecto) */
   --bg:#0b0b0b; --fg:#f5f5f5; --muted:#cfcfcf;
   --card:#171717; --border:#2a2a2a; --focus:#0ea5e9;
 
   /* Marca */
-  --btn-primary-bg:#99cd68; --btn-primary-fg:#08340f;   /* verde FALLTEM */
-  --btn-sec-bg:#5fcbe0;     --btn-sec-fg:#072a32;       /* celeste FALLTEM */
+  --btn-primary-bg:#99cd68; --btn-primary-fg:#08340f; /* verde */
+  --btn-sec-bg:#5fcbe0;     --btn-sec-fg:#072a32;     /* celeste */
 
   --ok:#16a34a; --bad:#dc2626;
 }
 [data-theme="light"]{
   --bg:#f8fbf4; --fg:#1b1b1b; --muted:#50380b;
   --card:#ffffff; --border:#e5e7eb; --focus:#5fcbe0;
-  --btn-sec-bg:#5fcbe0; --btn-sec-fg:#072a32;
+
+  /* FABs con fondo oscuro y texto CLARO */
+  --btn-sec-bg:#1b2325;
+  --btn-sec-fg:#eaf6ff;   /* o #ffffff */
+}
+.fixed-top-right .btn-ayuda{
+  text-shadow: 0 1px 1px rgba(0,0,0,.35);
 }
 
 /* ===== Base ===== */
@@ -58,7 +63,7 @@ body{
   display:grid;
   grid-template-columns: 1fr;
   gap: .9rem 1rem; align-items:end;
-  margin-bottom: calc(var(--space) * 1.1);   /* + aire antes del juego */
+  margin-bottom: calc(var(--space) * 1.1);
 }
 .control label{ display:block; font-weight:900; margin-bottom:.35rem }
 
@@ -88,42 +93,17 @@ select{
 .btn.principal{ background:var(--btn-primary-bg); color:var(--btn-primary-fg) }
 .btn.secundario{ background:var(--btn-sec-bg); color:var(--btn-sec-fg) }
 
-/* ===== Botón de tema redondo con icono ===== */
-.btn-theme{
-  width:44px; height:44px; border-radius:50%;
-  padding:0; min-height:44px;
-  display:inline-flex; align-items:center; justify-content:center;
-  background:var(--btn-sec-bg); color:var(--btn-sec-fg);
-  box-shadow:0 2px 6px rgba(0,0,0,.15);
-  border:0; cursor:pointer;
-}
-.btn-theme:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
-.btn-theme::before{
-  /* Icono por defecto (se sobreescribe según tema) */
-  content:"🌙";
-  font-size:1.15rem; line-height:1;
-}
-/* Si está en oscuro, mostramos ☀️ (acción: pasar a claro) */
-[data-theme="dark"] .btn-theme::before{ content:"☀️"; }
-/* Si está en claro, mostramos 🌙 (acción: pasar a oscuro) */
-[data-theme="light"] .btn-theme::before{ content:"🌙"; }
-
 /* --- Desktop: botones parejos y centrados --- */
 @media (min-width: 900px){
   .controles{
     grid-template-columns: repeat(3, minmax(220px, 1fr));
   }
   .control.buttons{
-    grid-column: 1 / -1;           /* que ocupen toda la fila */
+    grid-column: 1 / -1;
     justify-content:center;
     margin-top: .2rem;
   }
-  .control.buttons .btn{
-    min-width: 220px;              /* mismo ancho visual para los rectangulares */
-  }
-  .control.buttons .btn-theme{
-    min-width:auto;                /* el redondo no se estira */
-  }
+  .control.buttons .btn{ min-width: 220px; }
 }
 
 /* ===== Juego ===== */
@@ -139,48 +119,7 @@ select{
   letter-spacing:.2px;
 }
 
-/* Campo + acciones */
-.respuesta{
-  display:grid; grid-template-columns: 1fr auto; gap:.7rem; align-items:center; margin-bottom:.6rem;
-}
-#inputResp{
-  font-size: clamp(1.2rem, 1vw + 1rem, 1.55rem);
-  padding:.9rem 1rem; border-radius:.9rem;
-  border:1px solid var(--border); background:var(--card); color:var(--fg);
-  font-weight:800;
-}
-#inputResp:focus{ outline:3px solid var(--focus); outline-offset:2px }
-
-/* Teclado */
-.teclado{
-  display:grid; grid-template-columns: repeat(3, 1fr); gap:.6rem; margin-top:.4rem;
-}
-.teclado button{
-  padding:1rem; font-size:1.25rem; font-weight:900; cursor:pointer;
-  border-radius:.9rem; border:1px solid var(--border); background:var(--card); color:var(--fg);
-  transition: transform .08s ease, filter .15s ease, border-color .15s ease;
-}
-.teclado button:hover,
-.teclado button:focus-visible{
-  filter:brightness(1.05);
-  transform:translateY(-1px);
-  outline:3px solid var(--focus);
-  outline-offset:2px;
-}
-.teclado button.ok{ background:var(--btn-primary-bg); color:var(--btn-primary-fg); border:0 }
-.teclado button.sec{ background:var(--btn-sec-bg); color:var(--btn-sec-fg); border:0 }
-.teclado .cero{ grid-column: span 2; }
-
-/* Feedback */
-.feedback{ font-size:1.05rem; margin:.5rem 0 0 }
-.feedback.ok{ color: var(--ok) }
-.feedback.bad{ color: var(--bad) }
-.muted{ color: var(--muted) }
-
-/* Estado */
-.estado p{ margin:.28rem 0 }
-
-/* ===== Opciones múltiples (cuando se use este modo) ===== */
+/* Opciones múltiples (A–D) */
 .opciones{
   display:grid; grid-template-columns: 1fr; gap:.8rem; margin-top:.6rem;
 }
@@ -224,58 +163,71 @@ select{
   @keyframes pulse{ 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
 }
 
-/* FABs arriba a la derecha */
+/* ===== FABs (ayuda + tema) arriba derecha ===== */
 .fixed-top-right{
   position: fixed;
   top: calc(12px + env(safe-area-inset-top, 0px));
   right: calc(12px + env(safe-area-inset-right, 0px));
   z-index: 10;
-  display:flex; flex-direction:column; gap:10px;
+  display:flex; flex-direction:column; gap:12px;
 }
 
-/* Botón ayuda (?) */
+/* Ayuda (?) */
 .btn-ayuda{
-  background:var(--btn-sec-bg); color:var(--btn-sec-fg); border:0;
-  width:44px; height:44px; border-radius:50%; font-weight:900; font-size:1.2rem; cursor:pointer;
-  box-shadow:0 2px 6px rgba(0,0,0,.2);
+  width:56px; height:56px; border-radius:50%;
+  border:0; cursor:pointer;
+  background:var(--btn-sec-bg); color:var(--btn-sec-fg);
+  font-weight:900; font-size:1.4rem; line-height:1;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
 }
 .btn-ayuda:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
 
-/* Botón tema redondo con icono */
+/* Tema (ícono con ::before; sin texto) */
 .btn-theme{
-  width:44px; height:44px; border-radius:50%;
-  padding:0; min-height:44px;
+  width:56px; height:56px; border-radius:50%;
+  border:0; cursor:pointer; line-height:1;
   display:inline-flex; align-items:center; justify-content:center;
   background:var(--btn-sec-bg); color:var(--btn-sec-fg);
-  box-shadow:0 2px 6px rgba(0,0,0,.15);
-  border:0; cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.25);
+  font-size:0; /* ocultar texto si lo hubiese */
 }
 .btn-theme:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
-.btn-theme::before{ content:"🌙"; font-size:1.15rem; line-height:1 }
-/* en oscuro muestro ☀️ (acción: pasar a claro) */
-[data-theme="dark"] .btn-theme::before{ content:"☀️"; }
-/* en claro muestro 🌙 (acción: pasar a oscuro) */
-[data-theme="light"] .btn-theme::before{ content:"🌙"; }
+/* Icono según tema (sin “circulito” del emoji; usamos el fondo del botón) */
+[data-theme="light"] .btn-theme::before{
+  content:"🌙"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35));
+}
+[data-theme="dark"] .btn-theme::before{
+  content:"☀️"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35));
+}
 
+/* ===== Modal ===== */
+.modal[hidden]{ display:none !important; }
+.modal{
+  position:fixed; inset:0;
+  display:flex; align-items:flex-start; justify-content:center;
+  padding:min(5vh,48px) 16px;
+  background:rgba(0,0,0,.55);
+  z-index:1000;
+}
+.modal-card{
+  width:min(820px,100%);
+  background:var(--card); color:var(--fg);
+  border:1px solid var(--border); border-radius:12px;
+  box-shadow:0 12px 30px rgba(0,0,0,.35);
+  padding:var(--space);
+}
+.modal-actions{ display:flex; gap:10px; justify-content:flex-end }
 
 /* ===== Footer ===== */
 .mini-credit{
-  margin-top:.6rem;
-  padding:.4rem 0;
+  margin-top:.6rem; padding:.4rem 0;
   border-top:1px solid var(--border);
-  font-size:.65em;
-  line-height:1.35;
-  color:var(--muted);
-
-  max-width:980px;
-  margin-inline:auto;
-  display:flex;             /* centra incluso si hay varios nodos hijos */
-  flex-direction:column;
-  align-items:center;       /* centra horizontalmente los hijos */
-  text-align:center;        /* centra el texto de cada hijo */
+  font-size:.65em; line-height:1.35; color:var(--muted);
+  max-width:980px; margin-inline:auto;
+  display:flex; flex-direction:column; align-items:center; text-align:center;
 }
 
-/* ===== Skip link ===== */
+/* ===== Accesibilidad ===== */
 .skip{ position:absolute; left:-9999px; top:auto }
 .skip:focus{
   left:12px; top:12px; background:var(--btn-primary-bg); color:var(--btn-primary-fg);
@@ -291,50 +243,3 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
   *{ scroll-behavior:auto }
   #pbFill{ transition:none }
 }
-
-/* Fallback si los botones están en .buttons (sin .control) */
-.controles > .buttons{
-  display:flex; gap:.9rem; flex-wrap:wrap;
-  justify-content:center; align-items:center;
-}
-@media (min-width: 900px){
-  .controles > .buttons{
-    grid-column: 1 / -1;
-  }
-  .controles > .buttons .btn{ min-width:220px; }
-  .controles > .buttons .btn-theme{ min-width:auto; }
-}
-
-.modal[hidden] { display: none !important; }
-
-/* Modal overlay – capa completa */
-.modal[hidden] { display: none !important; }
-
-.modal{
-  position: fixed;
-  inset: 0;                           /* top/right/bottom/left: 0 */
-  display: flex;
-  align-items: flex-start;            /* tarjeta arriba */
-  justify-content: center;
-  padding: min(5vh, 48px) 16px;       /* respiración + margen lateral */
-  background: rgba(0,0,0,.55);        /* backdrop */
-  z-index: 1000;                      /* por encima del resto */
-}
-
-/* Tarjeta del modal */
-.modal-card{
-  width: min(820px, 100%);
-  background: var(--card);
-  color: var(--fg);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  box-shadow: 0 12px 30px rgba(0,0,0,.35);
-  padding: var(--space);
-}
-
-.modal-actions{
-  display: flex;
-  gap: 10px;
-  justify-content: flex-end;
-}
-
