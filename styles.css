@@ -243,3 +243,4 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
   *{ scroll-behavior:auto }
   #pbFill{ transition:none }
 }
+
