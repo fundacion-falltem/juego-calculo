@@ -88,6 +88,26 @@ select{
 .btn.principal{ background:var(--btn-primary-bg); color:var(--btn-primary-fg) }
 .btn.secundario{ background:var(--btn-sec-bg); color:var(--btn-sec-fg) }
 
+/* ===== Botón de tema redondo con icono ===== */
+.btn-theme{
+  width:44px; height:44px; border-radius:50%;
+  padding:0; min-height:44px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--btn-sec-bg); color:var(--btn-sec-fg);
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+  border:0; cursor:pointer;
+}
+.btn-theme:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
+.btn-theme::before{
+  /* Icono por defecto (se sobreescribe según tema) */
+  content:"🌙";
+  font-size:1.15rem; line-height:1;
+}
+/* Si está en oscuro, mostramos ☀️ (acción: pasar a claro) */
+[data-theme="dark"] .btn-theme::before{ content:"☀️"; }
+/* Si está en claro, mostramos 🌙 (acción: pasar a oscuro) */
+[data-theme="light"] .btn-theme::before{ content:"🌙"; }
+
 /* --- Desktop: botones parejos y centrados --- */
 @media (min-width: 900px){
   .controles{
@@ -99,7 +119,10 @@ select{
     margin-top: .2rem;
   }
   .control.buttons .btn{
-    min-width: 220px;              /* mismo ancho visual */
+    min-width: 220px;              /* mismo ancho visual para los rectangulares */
+  }
+  .control.buttons .btn-theme{
+    min-width:auto;                /* el redondo no se estira */
   }
 }
 
@@ -201,29 +224,39 @@ select{
   @keyframes pulse{ 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
 }
 
-/* ===== FAB ayuda + modal ===== */
+/* FABs arriba a la derecha */
 .fixed-top-right{
   position: fixed;
   top: calc(12px + env(safe-area-inset-top, 0px));
   right: calc(12px + env(safe-area-inset-right, 0px));
-  z-index: 10; display:flex; flex-direction:column; gap:10px;
+  z-index: 10;
+  display:flex; flex-direction:column; gap:10px;
 }
-.btn-fab{
+
+/* Botón ayuda (?) */
+.btn-ayuda{
   background:var(--btn-sec-bg); color:var(--btn-sec-fg); border:0;
   width:44px; height:44px; border-radius:50%; font-weight:900; font-size:1.2rem; cursor:pointer;
   box-shadow:0 2px 6px rgba(0,0,0,.2);
 }
-.btn-fab:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
+.btn-ayuda:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
 
-.modal{ display:none; position:fixed; inset:0; background:rgba(0,0,0,.6); z-index:20 }
-.modal[aria-hidden="false"]{ display:block }
-.modal-card{
-  max-width:min(820px, 100% - 2*var(--space));
-  margin:5vh auto; background:var(--card); color:var(--fg);
-  padding:var(--space); border-radius:12px; border:1px solid var(--border)
+/* Botón tema redondo con icono */
+.btn-theme{
+  width:44px; height:44px; border-radius:50%;
+  padding:0; min-height:44px;
+  display:inline-flex; align-items:center; justify-content:center;
+  background:var(--btn-sec-bg); color:var(--btn-sec-fg);
+  box-shadow:0 2px 6px rgba(0,0,0,.15);
+  border:0; cursor:pointer;
 }
-.mt0{ margin-top:0 }
-.modal-actions{ display:flex; gap:10px; justify-content:flex-end }
+.btn-theme:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
+.btn-theme::before{ content:"🌙"; font-size:1.15rem; line-height:1 }
+/* en oscuro muestro ☀️ (acción: pasar a claro) */
+[data-theme="dark"] .btn-theme::before{ content:"☀️"; }
+/* en claro muestro 🌙 (acción: pasar a oscuro) */
+[data-theme="light"] .btn-theme::before{ content:"🌙"; }
+
 
 /* ===== Footer ===== */
 .mini-credit{
@@ -259,7 +292,6 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
   #pbFill{ transition:none }
 }
 
-
 /* Fallback si los botones están en .buttons (sin .control) */
 .controles > .buttons{
   display:flex; gap:.9rem; flex-wrap:wrap;
@@ -270,4 +302,39 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
     grid-column: 1 / -1;
   }
   .controles > .buttons .btn{ min-width:220px; }
+  .controles > .buttons .btn-theme{ min-width:auto; }
 }
+
+.modal[hidden] { display: none !important; }
+
+/* Modal overlay – capa completa */
+.modal[hidden] { display: none !important; }
+
+.modal{
+  position: fixed;
+  inset: 0;                           /* top/right/bottom/left: 0 */
+  display: flex;
+  align-items: flex-start;            /* tarjeta arriba */
+  justify-content: center;
+  padding: min(5vh, 48px) 16px;       /* respiración + margen lateral */
+  background: rgba(0,0,0,.55);        /* backdrop */
+  z-index: 1000;                      /* por encima del resto */
+}
+
+/* Tarjeta del modal */
+.modal-card{
+  width: min(820px, 100%);
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  box-shadow: 0 12px 30px rgba(0,0,0,.35);
+  padding: var(--space);
+}
+
+.modal-actions{
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+

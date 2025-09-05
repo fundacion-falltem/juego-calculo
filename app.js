@@ -1,7 +1,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const VERSION = "v1.2.3 (opciones + timer + alerta + mixto balanceado)";
+  const VERSION = "v1.2.4 (FAB tema + modal accesible + mixto balanceado)";
   const versionEl = document.getElementById('versionLabel');
   if (versionEl) versionEl.textContent = VERSION;
 
@@ -21,10 +21,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const progTxt   = document.getElementById('progTxt');
   const aciertosEl= document.getElementById('aciertos');
 
+  // FABs
   const themeBtn  = document.getElementById('themeToggle');
-  const aboutBtn  = document.getElementById('aboutBtn');
-  const aboutModal= document.getElementById('aboutModal');
-  const aboutClose= document.getElementById('aboutClose');
 
   // Timer
   const timerText = document.getElementById('timerText');
@@ -273,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // ===== Eventos
+  // ===== Eventos de juego
   btnComenzar.addEventListener('click', ()=>{
     operacion = opSel.value;
     dificultad = difSel.value;
@@ -325,44 +323,80 @@ document.addEventListener('DOMContentLoaded', () => {
     if (rs && ['6','8','10'].includes(rs)) ronSel.value = rs;
   }catch{}
 
-  // ===== Tema
+  // ===== Tema (icono lo pone CSS; aquí aria + storage)
   function applyTheme(mode){
-    const m=(mode==='light'||mode==='dark')?mode:'dark';
+    const m = (mode === 'light' || mode === 'dark') ? mode : 'dark';
     document.documentElement.setAttribute('data-theme', m);
-    if (themeBtn){
-      const isDark=(m==='dark');
-      themeBtn.textContent = isDark ? 'Cambiar a claro' : 'Cambiar a oscuro';
+
+    if (themeBtn) {
+      const isDark = (m === 'dark');
       themeBtn.setAttribute('aria-pressed', String(isDark));
+      themeBtn.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+      themeBtn.setAttribute('title', isDark ? 'Cambiar a claro' : 'Cambiar a oscuro');
     }
     const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) metaTheme.setAttribute('content', m==='dark' ? '#0b0b0b' : '#ffffff');
+    if (metaTheme) metaTheme.setAttribute('content', m === 'dark' ? '#0b0b0b' : '#ffffff');
   }
+
   (function initTheme(){
-    let mode='dark';
+    let mode = 'dark';
     try{
-      const stored=localStorage.getItem('theme');
-      if(stored==='light'||stored==='dark') mode=stored;
-      else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) mode='light';
+      const stored = localStorage.getItem('theme');
+      if (stored === 'light' || stored === 'dark') {
+        mode = stored;
+      } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) {
+        mode = 'light';
+      }
     }catch{}
     applyTheme(mode);
   })();
-  themeBtn.addEventListener('click', ()=>{
+
+  try {
+    if (!localStorage.getItem('theme') && window.matchMedia) {
+      const mq = window.matchMedia('(prefers-color-scheme: light)');
+      mq.addEventListener?.('change', (e) => applyTheme(e.matches ? 'light' : 'dark'));
+    }
+  } catch {}
+
+  themeBtn?.addEventListener('click', ()=>{
     const current = document.documentElement.getAttribute('data-theme') || 'dark';
     const next = current === 'dark' ? 'light' : 'dark';
     try { localStorage.setItem('theme', next); } catch {}
     applyTheme(next);
   });
 
-  // ===== Modal ayuda
-  function openAbout(){ aboutModal?.setAttribute('aria-hidden','false'); aboutClose?.focus(); }
-  function closeAbout(){ aboutModal?.setAttribute('aria-hidden','true'); }
-  aboutBtn?.addEventListener('click', openAbout);
-  aboutClose?.addEventListener('click', closeAbout);
-  aboutModal?.addEventListener('click', (e)=>{ if(e.target===aboutModal) closeAbout(); });
-  document.addEventListener('keydown', (e)=>{ if(e.key==='Escape') closeAbout(); });
+  /// ----- Ayuda / modal -----
+const aboutBtn   = document.getElementById('aboutBtn');
+const aboutModal = document.getElementById('aboutModal');
+const aboutClose = document.getElementById('aboutClose');
+
+// Asegurar estado inicial oculto
+if (aboutModal) {
+  aboutModal.setAttribute('aria-hidden', 'true');
+  aboutModal.hidden = true;
+}
+
+function openAbout(){
+  if (!aboutModal) return;
+  aboutModal.hidden = false;
+  aboutModal.setAttribute('aria-hidden', 'false');
+  aboutBtn?.setAttribute('aria-expanded', 'true');
+  aboutClose?.focus();
+}
+function closeAbout(){
+  if (!aboutModal) return;
+  aboutModal.hidden = true;
+  aboutModal.setAttribute('aria-hidden', 'true');
+  aboutBtn?.setAttribute('aria-expanded', 'false');
+}
+
+aboutBtn?.addEventListener('click', openAbout);
+aboutClose?.addEventListener('click', closeAbout);
+aboutModal?.addEventListener('click', (e)=>{ if (e.target === aboutModal) closeAbout(); });
+document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeAbout(); });
+
 
   // ===== Init
   actualizarUI();
   hideTimer(); // oculto timer hasta que arranque el juego
 });
-

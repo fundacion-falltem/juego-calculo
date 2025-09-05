@@ -20,18 +20,35 @@
 <body>
   <a href="#juego" class="skip">Saltar directamente al juego</a>
 
-  <!-- FAB Ayuda -->
-  <div class="fixed-top-right">
-    <button id="aboutBtn" class="btn-fab" type="button"
-            aria-haspopup="dialog" aria-controls="aboutModal"
-            aria-expanded="false" aria-label="¿Por qué este juego?">?</button>
-  </div>
+    <!-- FAB Ayuda + Tema -->
+    <div class="fixed-top-right">
+      <button id="aboutBtn"
+              class="btn-ayuda"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="aboutModal"
+              aria-expanded="false"
+              aria-label="¿Por qué este juego?">?</button>
 
-  <!-- Modal ayuda -->
-  <div id="aboutModal" class="modal" role="dialog" aria-modal="true" aria-hidden="true" aria-labelledby="aboutTitle">
-    <div class="modal-card" role="document">
-      <h2 id="aboutTitle" class="mt0">¿Por qué este juego?</h2>
-      <p>Ejercita <strong>cálculo básico</strong>, <strong>atención</strong> y <strong>velocidad de procesamiento</strong>.
+      <button id="themeToggle"
+              class="btn-theme"
+              type="button"
+              aria-pressed="false"
+              aria-label="Cambiar a modo oscuro"
+              title="Cambiar tema"></button>
+    </div>
+
+    <!-- Modal ayuda (arranca oculto) -->
+    <div id="aboutModal"
+        class="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-hidden="true"
+        aria-labelledby="aboutTitle"
+        hidden>
+      <div class="modal-card" role="document">
+        <h2 id="aboutTitle" class="mt0">¿Por qué este juego?</h2>
+        <p>Ejercita <strong>cálculo básico</strong>, <strong>atención</strong> y <strong>velocidad de procesamiento</strong>.
          No hay límite de sesiones; hacelo con calma.</p>
       <ul>
         <li>Sesiones cortas (5–10 min), 2–3 veces por semana.</li>
@@ -39,11 +56,13 @@
         <li>Respondé con botones grandes o con las teclas <strong>A–D</strong>.</li>
       </ul>
       <p class="muted"><small>Actividad <strong>lúdica</strong>; no es práctica médica. No recolectamos datos personales.</small></p>
-      <div class="modal-actions">
-        <button id="aboutClose" class="btn principal" type="button">Entendido</button>
+        <div class="modal-actions">
+          <button id="aboutClose" class="btn principal" type="button">Entendido</button>
+        </div>
       </div>
     </div>
-  </div>
+
+
 
   <main class="wrap" role="main" aria-labelledby="titulo">
     <header class="header">
@@ -82,7 +101,7 @@
         </div>
 
         <div class="control buttons">
-          <button id="themeToggle" class="btn secundario" type="button">Cambiar tema</button>
+          <!-- Se quitó el botón textual de tema -->
           <button id="btnComenzar" class="btn principal" type="button">Comenzar</button>
           <button id="btnReiniciar" class="btn secundario" type="button" hidden>Volver a jugar</button>
         </div>
