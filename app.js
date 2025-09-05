@@ -1,7 +1,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const VERSION = "v1.5.0 (feedback adaptativo + CTAs)";
+  const VERSION = "v1.6.0 (feedback adaptativo + botón Continuar)";
   const versionEl = document.getElementById('versionLabel');
   if (versionEl) versionEl.textContent = VERSION;
 
@@ -28,6 +28,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const timerText = document.getElementById('timerText');
   const timerFill = document.getElementById('timerFill');
   const timerBar  = document.querySelector('.timerBar');
+
+  const finalActions = document.getElementById('finalActions');
 
   // ======================================================
   // ESTADO
@@ -93,12 +95,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // TIMER
   // ======================================================
   function showTimer(){
-    if (timerText){ timerText.style.display = '';  timerText.setAttribute('aria-hidden','false'); }
-    if (timerBar){  timerBar.style.display  = '';  timerBar.setAttribute('aria-hidden','false'); }
+    timerText.style.display = ''; timerText.setAttribute('aria-hidden','false');
+    timerBar.style.display  = ''; timerBar.setAttribute('aria-hidden','false');
   }
   function hideTimer(){
-    if (timerText){ timerText.style.display = 'none'; timerText.setAttribute('aria-hidden','true'); }
-    if (timerBar){  timerBar.style.display  = 'none'; timerBar.setAttribute('aria-hidden','true'); }
+    timerText.style.display = 'none'; timerText.setAttribute('aria-hidden','true');
+    timerBar.style.display  = 'none'; timerBar.setAttribute('aria-hidden','true');
   }
   function stopTimer(){ if (timerId){ clearInterval(timerId); timerId = null; } }
   function startTimer(ms){
@@ -110,21 +112,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 100);
   }
   function updateTimerUI(){
-    if (timerText){
-      const s = Math.ceil(timeLeft / 1000);
-      setTxt(timerText, s > 0 ? `Tiempo: ${s} s` : 'Tiempo: 0 s');
-      const alerta = timeLeft <= 3000 && timeLeft > 0;
-      timerText.classList.toggle('timer-alert', alerta);
-      timerText.classList.toggle('timer-pulse', alerta);
-      if (alerta && navigator.vibrate) navigator.vibrate(40);
-    }
-    if (timerFill && timeMax > 0){
-      const pct = Math.max(0, Math.min(100, Math.round((timeLeft / timeMax) * 100)));
-      timerFill.style.width = pct + '%';
-      let level = 'normal';
-      if (timeLeft > 0){ if (pct <= 15) level = 'alert'; else if (pct <= 35) level = 'warn'; }
-      timerFill.dataset.level = level;
-    }
+    const s = Math.ceil(timeLeft / 1000);
+    setTxt(timerText, s > 0 ? `Tiempo: ${s} s` : 'Tiempo: 0 s');
+    const alerta = timeLeft <= 3000 && timeLeft > 0;
+    timerText.classList.toggle('timer-alert', alerta);
+    timerText.classList.toggle('timer-pulse', alerta);
+    if (alerta && navigator.vibrate) navigator.vibrate(40);
+    const pct = Math.max(0, Math.min(100, Math.round((timeLeft / timeMax) * 100)));
+    timerFill.style.width = pct + '%';
+    let level = 'normal';
+    if (timeLeft > 0){ if (pct <= 15) level = 'alert'; else if (pct <= 35) level = 'warn'; }
+    timerFill.dataset.level = level;
   }
 
   // ======================================================
@@ -164,58 +162,65 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ======================================================
-  // FEEDBACK DE CIERRE
+  // FEEDBACK + CIERRE
   // ======================================================
-  function cierreDeSesion({ aciertos, rondas, tiempoPromedioMs = null, tono = 'sobrio' }){
+  function cierreDeSesion({ aciertos, rondas, tiempoPromedioMs = null }){
     const pct = Math.round((aciertos / Math.max(1, rondas)) * 100);
     let titulo = '', recomendacion = '';
-    if (pct >= 90){ titulo = 'Excelente precisión.'; recomendacion = 'Probá subir un nivel o reducir el tiempo por pregunta.'; }
-    else if (pct >= 70){ titulo = 'Buen rendimiento.'; recomendacion = 'Mantené este nivel y buscá 90% en 1–2 sesiones.'; }
-    else if (pct >= 50){ titulo = 'Rendimiento estable.'; recomendacion = 'Repetí este nivel hasta superar el 70%.'; }
-    else { titulo = 'Sesión desafiante.'; recomendacion = 'Bajá un nivel o aumentá el tiempo para afianzar.'; }
+    if (pct >= 90){ titulo = 'Excelente precisión.'; recomendacion = 'Podés animarte a subir la dificultad.'; }
+    else if (pct >= 70){ titulo = 'Buen rendimiento.'; recomendacion = 'Repetí este nivel hasta llegar al 90%.'; }
+    else if (pct >= 50){ titulo = 'Rendimiento estable.'; recomendacion = 'Reforzá este nivel antes de subir.'; }
+    else { titulo = 'Sesión desafiante.'; recomendacion = 'Conviene bajar un nivel para afianzar.'; }
     const tiempoStr = (tiempoPromedioMs != null) ? ` • Promedio: ${(tiempoPromedioMs/1000).toFixed(1)} s` : '';
-    const base = `${titulo} Precisión: ${pct}%${tiempoStr}. ${recomendacion}`;
-    return (tono === 'calido') ? base + ' 🙂' : base;
+    return `${titulo} Precisión: ${pct}%${tiempoStr}. ${recomendacion}`;
   }
 
-  // ======================================================
-  // CTAs
-  // ======================================================
-  function renderCTAs(pct){
-    const ctaWrap = document.createElement('div');
-    ctaWrap.className = 'cta-buttons';
-    function addBtn(txt, action){
-      const b = document.createElement('button');
-      b.textContent = txt;
-      b.className = 'btn secundario';
-      b.addEventListener('click', action);
-      ctaWrap.appendChild(b);
-    }
+  function renderFinalActions(pct){
+    finalActions.innerHTML = '';
+    const btn = document.createElement('button');
+    btn.className = 'btn principal';
     if (pct >= 90){
-      addBtn('🔼 Subir dificultad', ()=> cambiarDificultad(+1));
-      addBtn('⏱️ Menos tiempo', ()=> cambiarTiempo(-2000));
+      btn.textContent = 'Continuar: Subir dificultad';
+      btn.addEventListener('click', ()=> cambiarDificultad(+1));
     } else if (pct >= 70){
-      addBtn('🔁 Repetir nivel', ()=> btnComenzar.click());
-      addBtn('🔼 Subir dificultad', ()=> cambiarDificultad(+1));
+      btn.textContent = 'Continuar: Repetir nivel';
+      btn.addEventListener('click', ()=> btnComenzar.click());
     } else if (pct >= 50){
-      addBtn('🔁 Repetir nivel', ()=> btnComenzar.click());
-      addBtn('⬇️ Bajar dificultad', ()=> cambiarDificultad(-1));
+      btn.textContent = 'Continuar: Reforzar este nivel';
+      btn.addEventListener('click', ()=> btnComenzar.click());
     } else {
-      addBtn('⬇️ Bajar dificultad', ()=> cambiarDificultad(-1));
-      addBtn('⏳ Más tiempo', ()=> cambiarTiempo(+2000));
+      btn.textContent = 'Continuar: Bajar dificultad';
+      btn.addEventListener('click', ()=> cambiarDificultad(-1));
     }
-    return ctaWrap;
+    finalActions.appendChild(btn);
+
+    const link = document.createElement('a');
+    link.href = '#';
+    link.textContent = '⚙️ Elegir otra configuración';
+    link.addEventListener('click', (e)=>{ e.preventDefault(); btnReiniciar.click(); });
+    finalActions.appendChild(link);
+
+    finalActions.hidden = false;
   }
+
+  function finalizarSesion(){
+    const tiempoPromedio = (rondasTotales > 0) ? Math.round(totalTiempoAcumuladoMs / rondasTotales) : null;
+    const texto = cierreDeSesion({ aciertos, rondas: rondasTotales, tiempoPromedioMs: tiempoPromedio });
+    const pct = Math.round((aciertos / Math.max(1, rondasTotales)) * 100);
+    setTxt(enunciado, 'Sesión finalizada');
+    setTxt(feedback, texto);
+    feedback.className = (pct >= 70) ? 'feedback ok' : (pct >= 50 ? 'feedback muted' : 'feedback bad');
+    renderFinalActions(pct);
+    btnReiniciar.hidden = false; btnComenzar.hidden = true;
+    actualizarUI(); hideTimer(); setTxt(timerText, '');
+    timerFill.style.width = '0%'; timerFill.dataset.level = 'normal';
+  }
+
   function cambiarDificultad(delta){
     const orden = ['facil','medio','avanzado'];
     let idx = orden.indexOf(dificultad);
     idx = Math.max(0, Math.min(orden.length-1, idx + delta));
     difSel.value = orden[idx];
-    btnComenzar.click();
-  }
-  function cambiarTiempo(deltaMs){
-    const current = Number(localStorage.getItem('extra_time') || 0);
-    localStorage.setItem('extra_time', String(current + deltaMs));
     btnComenzar.click();
   }
 
@@ -232,31 +237,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const opciones = barajar([respuestaCorrecta, ...barajar(distractores).slice(0,3)]);
     limpiarEstadosOpciones(); renderOpciones(opciones);
     setTxt(feedback, ''); feedback.className = 'feedback muted';
+    finalActions.hidden = true;
     actualizarUI();
     showTimer(); startTimer(tiempoPorDificultad());
   }
   function actualizarUI(){
     setTxt(progTxt, `${Math.min(ronda, rondasTotales)}/${rondasTotales}`);
     setTxt(aciertosEl, aciertos);
-    if (pbFill){ const pct = Math.round((Math.min(ronda, rondasTotales)/rondasTotales) * 100); pbFill.style.width = pct + '%'; }
+    const pct = Math.round((Math.min(ronda, rondasTotales)/rondasTotales) * 100);
+    pbFill.style.width = pct + '%';
   }
   function bloquearOpciones(){ opcionesEl.querySelectorAll('button').forEach(b=> b.disabled = true); }
   function marcarCorrectaVisual(){
     const correctoBtn = Array.from(opcionesEl.children).find(el => Number(el.getAttribute('data-val')) === respuestaCorrecta);
     if (correctoBtn) correctoBtn.classList.add('ok');
-  }
-
-  function finalizarSesion(){
-    const tiempoPromedio = (rondasTotales > 0) ? Math.round(totalTiempoAcumuladoMs / rondasTotales) : null;
-    const texto = cierreDeSesion({ aciertos, rondas: rondasTotales, tiempoPromedioMs: tiempoPromedio, tono: 'sobrio' });
-    const pct = Math.round((aciertos / Math.max(1, rondasTotales)) * 100);
-    setTxt(enunciado, 'Sesión finalizada');
-    setTxt(feedback, texto);
-    feedback.className = (pct >= 70) ? 'feedback ok' : (pct >= 50 ? 'feedback muted' : 'feedback bad');
-    feedback.appendChild(renderCTAs(pct));
-    btnReiniciar.hidden = false; btnComenzar.hidden = true;
-    actualizarUI(); hideTimer(); setTxt(timerText, '');
-    if (timerFill) { timerFill.style.width = '0%'; timerFill.dataset.level = 'normal'; }
   }
 
   function elegir(valor, btn){
@@ -288,19 +282,23 @@ document.addEventListener('DOMContentLoaded', () => {
     try{ localStorage.setItem('calc_op', operacion); localStorage.setItem('calc_diff', dificultad); localStorage.setItem('calc_rondas', String(rondasTotales)); }catch{}
     ronda = 0; aciertos = 0; totalTiempoAcumuladoMs = 0;
     btnComenzar.hidden = true; btnReiniciar.hidden = true;
-    setTxt(timerText, ''); if (timerFill){ timerFill.style.width = '0%'; timerFill.dataset.level = 'normal'; }
+    setTxt(timerText, ''); timerFill.style.width = '0%'; timerFill.dataset.level = 'normal';
     nuevaPregunta();
   });
+
   btnReiniciar.addEventListener('click', ()=>{
     stopTimer(); btnComenzar.hidden = false; btnReiniciar.hidden = true;
     setTxt(enunciado, 'Presioná “Comenzar” para iniciar.'); setTxt(feedback, ''); feedback.className = 'feedback muted'; opcionesEl.innerHTML = '';
     ronda = 0; aciertos = 0; totalTiempoAcumuladoMs = 0;
-    actualizarUI(); hideTimer(); setTxt(timerText, ''); if (timerFill){ timerFill.style.width = '0%'; timerFill.dataset.level = 'normal'; }
+    actualizarUI(); hideTimer(); setTxt(timerText, ''); timerFill.style.width = '0%'; timerFill.dataset.level = 'normal';
+    finalActions.hidden = true;
   });
 
-  try{ const op = localStorage.getItem('calc_op'); if (op && ['suma','resta','mixto'].includes(op)) opSel.value = op;
-       const df = localStorage.getItem('calc_diff'); if (df && ['facil','medio','avanzado'].includes(df)) difSel.value = df;
-       const rs = localStorage.getItem('calc_rondas'); if (rs && ['6','8','10'].includes(rs)) ronSel.value = rs; }catch{}
+  try{
+    const op = localStorage.getItem('calc_op'); if (op && ['suma','resta','mixto'].includes(op)) opSel.value = op;
+    const df = localStorage.getItem('calc_diff'); if (df && ['facil','medio','avanzado'].includes(df)) difSel.value = df;
+    const rs = localStorage.getItem('calc_rondas'); if (rs && ['6','8','10'].includes(rs)) ronSel.value = rs;
+  }catch{}
 
   // ======================================================
   // TEMA
@@ -308,23 +306,34 @@ document.addEventListener('DOMContentLoaded', () => {
   function applyTheme(mode){
     const m = (mode === 'light' || mode === 'dark') ? mode : 'dark';
     document.documentElement.setAttribute('data-theme', m);
-    if (themeBtn) {
-      const isDark = (m === 'dark');
-      themeBtn.setAttribute('aria-pressed', String(isDark));
-      themeBtn.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-      themeBtn.setAttribute('title', isDark ? 'Cambiar a claro' : 'Cambiar a oscuro');
-    }
+    const isDark = (m === 'dark');
+    themeBtn.setAttribute('aria-pressed', String(isDark));
+    themeBtn.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
+    themeBtn.setAttribute('title', isDark ? 'Cambiar a claro' : 'Cambiar a oscuro');
     const metaTheme = document.querySelector('meta[name="theme-color"]');
     if (metaTheme) metaTheme.setAttribute('content', m === 'dark' ? '#0b0b0b' : '#ffffff');
   }
   (function initTheme(){
     let mode = 'dark';
-    try{ const stored = localStorage.getItem('theme'); if (stored === 'light' || stored === 'dark') { mode = stored; }
-         else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) { mode = 'light'; } }catch{}
+    try{
+      const stored = localStorage.getItem('theme');
+      if (stored === 'light' || stored === 'dark') { mode = stored; }
+      else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) { mode = 'light'; }
+    }catch{}
     applyTheme(mode);
   })();
-  try { if (!localStorage.getItem('theme') && window.matchMedia) { const mq = window.matchMedia('(prefers-color-scheme: light)'); mq.addEventListener?.('change', (e) => applyTheme(e.matches ? 'light' : 'dark')); } } catch {}
-  themeBtn?.addEventListener('click', ()=>{ const current = document.documentElement.getAttribute('data-theme') || 'dark'; const next = current === 'dark' ? 'light' : 'dark'; try { localStorage.setItem('theme', next); } catch {} applyTheme(next); });
+  try {
+    if (!localStorage.getItem('theme') && window.matchMedia) {
+      const mq = window.matchMedia('(prefers-color-scheme: light)');
+      mq.addEventListener?.('change', (e) => applyTheme(e.matches ? 'light' : 'dark'));
+    }
+  } catch {}
+  themeBtn?.addEventListener('click', ()=>{
+    const current = document.documentElement.getAttribute('data-theme') || 'dark';
+    const next = current === 'dark' ? 'light' : 'dark';
+    try { localStorage.setItem('theme', next); } catch {}
+    applyTheme(next);
+  });
 
   // ======================================================
   // MODAL DE AYUDA
@@ -333,8 +342,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const aboutModal = document.getElementById('aboutModal');
   const aboutClose = document.getElementById('aboutClose');
   if (aboutModal) { aboutModal.setAttribute('aria-hidden', 'true'); aboutModal.hidden = true; }
-  function openAbout(){ if (!aboutModal) return; aboutModal.hidden = false; aboutModal.setAttribute('aria-hidden', 'false'); aboutBtn?.setAttribute('aria-expanded', 'true'); aboutClose?.focus(); }
-  function closeAbout(){ if (!aboutModal) return; aboutModal.hidden = true; aboutModal.setAttribute('aria-hidden', 'true'); aboutBtn?.setAttribute('aria-expanded', 'false'); }
+  function openAbout(){ aboutModal.hidden = false; aboutModal.setAttribute('aria-hidden', 'false'); aboutBtn?.setAttribute('aria-expanded', 'true'); aboutClose?.focus(); }
+  function closeAbout(){ aboutModal.hidden = true; aboutModal.setAttribute('aria-hidden', 'true'); aboutBtn?.setAttribute('aria-expanded', 'false'); }
   aboutBtn?.addEventListener('click', openAbout);
   aboutClose?.addEventListener('click', closeAbout);
   aboutModal?.addEventListener('click', (e)=>{ if (e.target === aboutModal) closeAbout(); });
@@ -343,5 +352,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // ======================================================
   // INIT
   // ======================================================
-  actualizarUI(); hideTimer();
+  actualizarUI(); hideTimer(); finalActions.hidden = true;
 });

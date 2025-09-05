@@ -15,64 +15,62 @@
                  base-uri 'none'; form-action 'none'">
 
   <title>Cálculo amable — Juegos Cognitivos</title>
-  <link rel="stylesheet" href="./styles.css?v=1.2.2">
+  <link rel="stylesheet" href="./styles.css?v=1.3.0">
 </head>
 <body>
   <a href="#juego" class="skip">Saltar directamente al juego</a>
 
-    <!-- FAB Ayuda + Tema -->
-    <div class="fixed-top-right">
-      <button id="aboutBtn"
-              class="btn-ayuda"
-              type="button"
-              aria-haspopup="dialog"
-              aria-controls="aboutModal"
-              aria-expanded="false"
-              aria-label="¿Por qué este juego?">?</button>
+  <!-- FAB Ayuda + Tema -->
+  <div class="fixed-top-right">
+    <button id="aboutBtn"
+            class="btn-ayuda"
+            type="button"
+            aria-haspopup="dialog"
+            aria-controls="aboutModal"
+            aria-expanded="false"
+            aria-label="¿Por qué este juego?">?</button>
 
-      <button id="themeToggle"
-              class="btn-theme"
-              type="button"
-              aria-pressed="false"
-              aria-label="Cambiar a modo oscuro"
-              title="Cambiar tema"></button>
-    </div>
+    <button id="themeToggle"
+            class="btn-theme"
+            type="button"
+            aria-pressed="false"
+            aria-label="Cambiar a modo oscuro"
+            title="Cambiar tema"></button>
+  </div>
 
-    <!-- Modal ayuda (arranca oculto) -->
-    <div id="aboutModal"
-        class="modal"
-        role="dialog"
-        aria-modal="true"
-        aria-hidden="true"
-        aria-labelledby="aboutTitle"
-        hidden>
-      <div class="modal-card" role="document">
-        <h2 id="aboutTitle" class="mt0">¿Por qué este juego?</h2>
-          <p>
-            Este ejercicio estimula <strong>cálculo básico</strong>, 
-            <strong>atención</strong> y <strong>velocidad de procesamiento</strong>, 
-            habilidades importantes para mantener la mente activa 
-            (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4055506/" target="_blank" rel="noopener noreferrer">Kable et al., 2014</a>).
-            Podés jugar sin límite de sesiones, siempre a tu ritmo.
-          </p>
+  <!-- Modal ayuda (arranca oculto) -->
+  <div id="aboutModal"
+      class="modal"
+      role="dialog"
+      aria-modal="true"
+      aria-hidden="true"
+      aria-labelledby="aboutTitle"
+      hidden>
+    <div class="modal-card" role="document">
+      <h2 id="aboutTitle" class="mt0">¿Por qué este juego?</h2>
+      <p>
+        Este ejercicio estimula <strong>cálculo básico</strong>, 
+        <strong>atención</strong> y <strong>velocidad de procesamiento</strong>, 
+        habilidades importantes para mantener la mente activa 
+        (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4055506/" target="_blank" rel="noopener noreferrer">Kable et al., 2014</a>).
+        Podés jugar sin límite de sesiones, siempre a tu ritmo.
+      </p>
 
-          <ul>
-            <li>Hacelo en <strong>sesiones cortas</strong> (5–10 min), 2–3 veces por semana.</li>
-            <li>Empezá en <strong>Fácil</strong> y subí la dificultad cuando te resulte cómodo.</li>
-            <li>Respondé con <strong>botones grandes</strong> o usando las teclas <strong>A–D</strong>.</li>
-          </ul>
+      <ul>
+        <li>Hacelo en <strong>sesiones cortas</strong> (5–10 min), 2–3 veces por semana.</li>
+        <li>Empezá en <strong>Fácil</strong> y subí la dificultad cuando te resulte cómodo.</li>
+        <li>Respondé con <strong>botones grandes</strong> o usando las teclas <strong>A–D</strong>.</li>
+      </ul>
 
-          <p class="muted aviso">
-            <small>ℹ️ <strong>Actividad lúdica:</strong> no es práctica médica. No recolectamos datos personales.</small>
-          </p>
+      <p class="muted aviso">
+        <small>ℹ️ <strong>Actividad lúdica:</strong> no es práctica médica. No recolectamos datos personales.</small>
+      </p>
 
-        <div class="modal-actions">
-          <button id="aboutClose" class="btn principal" type="button">Entendido</button>
-        </div>
+      <div class="modal-actions">
+        <button id="aboutClose" class="btn principal" type="button">Entendido</button>
       </div>
     </div>
-
-
+  </div>
 
   <main class="wrap" role="main" aria-labelledby="titulo">
     <header class="header">
@@ -111,7 +109,6 @@
         </div>
 
         <div class="control buttons">
-          <!-- Se quitó el botón textual de tema -->
           <button id="btnComenzar" class="btn principal" type="button">Comenzar</button>
           <button id="btnReiniciar" class="btn secundario" type="button" hidden>Volver a jugar</button>
         </div>
@@ -137,6 +134,11 @@
 
       <!-- Feedback -->
       <p id="feedback" class="feedback muted" role="status" aria-live="polite" aria-atomic="true"></p>
+
+      <!-- Acciones de cierre dinámicas -->
+      <div id="finalActions" class="cta-buttons" hidden>
+        <!-- El JS inyecta aquí el botón “Continuar” y el link “⚙️ Elegir otra configuración” -->
+      </div>
     </section>
 
     <!-- Estado -->
@@ -154,6 +156,6 @@
   </main>
 
   <noscript><p style="margin:1rem">Este juego necesita JavaScript para funcionar.</p></noscript>
-  <script src="app.js?v=1.2.3" defer></script>
+  <script src="app.js?v=1.3.0" defer></script>
 </body>
 </html>

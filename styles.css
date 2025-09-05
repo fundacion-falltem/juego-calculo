@@ -347,3 +347,34 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
   *{ scroll-behavior:auto }
   #pbFill{ transition:none }
 }
+
+/* ======================================================
+   CTAs de cierre (finalActions)
+   ====================================================== */
+
+#finalActions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: .6rem;
+  margin-top: 1.2rem;
+}
+
+#finalActions .btn {
+  min-width: 220px;
+  padding: 1rem 1.4rem;
+  font-size: 1.1rem;
+}
+
+#finalActions a {
+  font-size: .9rem;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color .15s ease;
+}
+
+#finalActions a:hover,
+#finalActions a:focus {
+  color: var(--focus);
+  text-decoration: underline;
+}
