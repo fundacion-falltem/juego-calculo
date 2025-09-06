@@ -176,42 +176,51 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${titulo} Precisión: ${pct}%${tiempoStr}. ${recomendacion}`;
   }
 
-  function renderFinalActions(pct){
-    finalActions.innerHTML = '';
+ function renderFinalActions(pct){
+  finalActions.innerHTML = '';
 
-    // Botón principal
-    const btn = document.createElement('button');
-    btn.className = 'btn principal';
+  // Botón principal (Continuar)
+  const btn = document.createElement('button');
+  btn.className = 'btn principal';
 
-    if (pct >= 90){
-      btn.textContent = 'Continuar: Subir dificultad';
-      btn.addEventListener('click', ()=> cambiarDificultad(+1));
-    } else if (pct >= 70){
-      btn.textContent = 'Continuar: Repetir nivel';
-      btn.addEventListener('click', ()=> btnComenzar.click());
-    } else if (pct >= 50){
-      btn.textContent = 'Continuar: Reforzar este nivel';
-      btn.addEventListener('click', ()=> btnComenzar.click());
-    } else {
-      btn.textContent = 'Continuar: Bajar dificultad';
-      btn.addEventListener('click', ()=> cambiarDificultad(-1));
-    }
-
-    finalActions.appendChild(btn);
-
-    // Link secundario
-    const link = document.createElement('a');
-    link.href = '#';
-    link.textContent = '⚙️ Elegir otra configuración';
-    link.addEventListener('click', (e)=> {
-      e.preventDefault();
-      btnReiniciar.click();
-    });
-    finalActions.appendChild(link);
-
-    finalActions.hidden = false;
-    btn.focus();
+  if (pct >= 90){
+    btn.textContent = 'Continuar: Subir dificultad';
+    btn.addEventListener('click', ()=> cambiarDificultad(+1));
+  } else if (pct >= 70){
+    btn.textContent = 'Continuar: Repetir nivel';
+    btn.addEventListener('click', ()=> btnComenzar.click());
+  } else if (pct >= 50){
+    btn.textContent = 'Continuar: Reforzar este nivel';
+    btn.addEventListener('click', ()=> btnComenzar.click());
+  } else {
+    btn.textContent = 'Continuar: Bajar dificultad';
+    btn.addEventListener('click', ()=> cambiarDificultad(-1));
   }
+  finalActions.appendChild(btn);
+
+  // Botón secundario: Elegir otro juego
+  const linkOtroJuego = document.createElement('a');
+  linkOtroJuego.href = 'https://falltem.org/juegos/#games-cards';
+  linkOtroJuego.className = 'btn secundario';
+  linkOtroJuego.textContent = 'Elegir otro juego';
+  linkOtroJuego.target = '_blank';          // opcional: nueva pestaña
+  linkOtroJuego.rel = 'noopener noreferrer';// seguridad/perform.
+  finalActions.appendChild(linkOtroJuego);
+
+  // Link pequeño: Elegir otra configuración
+  const linkConfig = document.createElement('a');
+  linkConfig.href = '#';
+  linkConfig.textContent = '⚙️ Elegir otra configuración';
+  linkConfig.addEventListener('click', (e)=> {
+    e.preventDefault();
+    btnReiniciar.click();
+  });
+  finalActions.appendChild(linkConfig);
+
+  finalActions.hidden = false;
+  btn.focus();
+}
+
 
   function finalizarSesion(){
     const tiempoPromedio = (rondasTotales > 0) ? Math.round(totalTiempoAcumuladoMs / rondasTotales) : null;
@@ -466,3 +475,5 @@ document.addEventListener('DOMContentLoaded', () => {
   hideTimer();
   finalActions.hidden = true;
 });
+
+
