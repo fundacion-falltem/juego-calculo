@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="description" content="Cálculo amable para personas mayores: sumas y restas con opciones grandes y tiempo por pregunta."/>
+  <meta name="description" content="Cálculo amable para personas mayores: sumas, restas, multiplicación y división con opciones grandes y tiempo por pregunta."/>
   <meta name="theme-color" content="#0b0b0b"/>
   <meta name="color-scheme" content="dark light"/>
   <meta name="referrer" content="strict-origin-when-cross-origin"/>
@@ -15,7 +15,7 @@
                  base-uri 'none'; form-action 'none'">
 
   <title>Cálculo amable — Juegos Cognitivos</title>
-  <link rel="stylesheet" href="./styles.css?v=1.3.0">
+  <link rel="stylesheet" href="./styles.css?v=1.7.0">
 </head>
 <body>
   <a href="#juego" class="skip">Saltar directamente al juego</a>
@@ -65,6 +65,7 @@
       <p class="muted aviso">
         <small>ℹ️ <strong>Actividad lúdica:</strong> no es práctica médica. No recolectamos datos personales.</small>
       </p>
+      <p class="muted aviso"><small id="versionLabel"></small></p>
 
       <div class="modal-actions">
         <button id="aboutClose" class="btn principal" type="button">Entendido</button>
@@ -75,21 +76,25 @@
   <main class="wrap" role="main" aria-labelledby="titulo">
     <header class="header">
       <h1 id="titulo">Cálculo amable</h1>
-      <p class="intro">Practicá sumas y restas a tu ritmo. ¡Seleccioná la respuesta correcta y disfrutá del progreso!</p>
+      <p class="intro">Practicá sumas, restas, multiplicación y división a tu ritmo. ¡Seleccioná la respuesta correcta y disfrutá del progreso!</p>
     </header>
 
     <!-- Controles -->
     <section class="card" aria-label="Controles">
       <div class="controles">
+        <!-- Operación -->
         <div class="control">
           <label for="operacion">Operación</label>
           <select id="operacion" aria-label="Elegir tipo de operación">
             <option value="suma" selected>Suma</option>
             <option value="resta">Resta</option>
-            <option value="mixto">Mixto</option>
+            <option value="multi">Multiplicación</option>
+            <option value="divi">División</option>
           </select>
-        </div>
 
+          
+
+        <!-- Dificultad -->
         <div class="control">
           <label for="dificultad">Dificultad</label>
           <select id="dificultad" aria-label="Elegir dificultad">
@@ -99,6 +104,7 @@
           </select>
         </div>
 
+        <!-- Rondas -->
         <div class="control">
           <label for="rondas">Rondas</label>
           <select id="rondas" aria-label="Elegir número de rondas">
@@ -108,6 +114,7 @@
           </select>
         </div>
 
+        <!-- Botones -->
         <div class="control buttons">
           <button id="btnComenzar" class="btn principal" type="button">Comenzar</button>
           <button id="btnReiniciar" class="btn secundario" type="button" hidden>Volver a jugar</button>
@@ -122,7 +129,7 @@
 
       <!-- Tiempo por pregunta -->
       <p id="timerText" class="timer-text" role="status" aria-live="polite" aria-atomic="true"></p>
-      <div class="timerBar" aria-hidden="true"><div id="timerFill"></div></div>
+      <div class="timerBar" aria-hidden="true"><div id="timerFill" data-level="normal"></div></div>
 
       <!-- Enunciado -->
       <p class="enunciado" id="enunciado" aria-live="polite">Presioná “Comenzar” para iniciar.</p>
@@ -137,7 +144,7 @@
 
       <!-- Acciones de cierre dinámicas -->
       <div id="finalActions" class="cta-buttons" hidden>
-        <!-- El JS inyecta aquí el botón “Continuar” y el link “⚙️ Elegir otra configuración” -->
+        <!-- El JS inyecta aquí: Continuar / Elegir otro juego / Configuración -->
       </div>
     </section>
 
@@ -156,6 +163,6 @@
   </main>
 
   <noscript><p style="margin:1rem">Este juego necesita JavaScript para funcionar.</p></noscript>
-  <script src="app.js?v=1.3.0" defer></script>
+  <script src="app.js?v=1.7.0" defer></script>
 </body>
 </html>

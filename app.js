@@ -1,7 +1,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const VERSION = "v1.6.1 (feedback adaptativo + CTA minimalista)";
+  const VERSION = "v1.8.0 (4 operaciones: + − × ÷)";
   const versionEl = document.getElementById('versionLabel');
   if (versionEl) versionEl.textContent = VERSION;
 
@@ -39,12 +39,11 @@ document.addEventListener('DOMContentLoaded', () => {
   let dificultad = 'facil';
   let respuestaCorrecta = null;
 
-  let lastOpUsed = null;
-  let sameOpStreak = 0;
-
+  // timer
   let timerId = null;
   let timeLeft = 0, timeMax = 0;
 
+  // métrica simple
   let totalTiempoAcumuladoMs = 0;
 
   // ======================================================
@@ -59,22 +58,14 @@ document.addEventListener('DOMContentLoaded', () => {
     if (dificultad === 'medio') return [0, 20];
     return [0, 50];
   }
-  function tiempoPorDificultad(){
+
+  function tiempoBasePorDificultad(){
     const extra = Number(localStorage.getItem('extra_time') || 0);
     if (dificultad === 'facil') return 14000 + extra;
     if (dificultad === 'medio') return 10000 + extra;
     return 7000 + extra;
   }
-  function elegirOperacion(){
-    if (operacion !== 'mixto') return operacion;
-    let pick = Math.random() < 0.5 ? 'suma' : 'resta';
-    if (lastOpUsed === pick && sameOpStreak >= 2){
-      pick = (pick === 'suma') ? 'resta' : 'suma';
-    }
-    if (lastOpUsed === pick){ sameOpStreak++; }
-    else { sameOpStreak = 1; lastOpUsed = pick; }
-    return pick;
-  }
+
   function generarDistractores(correcta, min, max){
     const set = new Set([correcta]);
     const candidatos = [];
@@ -176,51 +167,50 @@ document.addEventListener('DOMContentLoaded', () => {
     return `${titulo} Precisión: ${pct}%${tiempoStr}. ${recomendacion}`;
   }
 
- function renderFinalActions(pct){
-  finalActions.innerHTML = '';
+  function renderFinalActions(pct){
+    finalActions.innerHTML = '';
 
-  // Botón principal (Continuar)
-  const btn = document.createElement('button');
-  btn.className = 'btn principal';
+    // Botón principal
+    const btn = document.createElement('button');
+    btn.className = 'btn principal';
 
-  if (pct >= 90){
-    btn.textContent = 'Continuar: Subir dificultad';
-    btn.addEventListener('click', ()=> cambiarDificultad(+1));
-  } else if (pct >= 70){
-    btn.textContent = 'Continuar: Repetir nivel';
-    btn.addEventListener('click', ()=> btnComenzar.click());
-  } else if (pct >= 50){
-    btn.textContent = 'Continuar: Reforzar este nivel';
-    btn.addEventListener('click', ()=> btnComenzar.click());
-  } else {
-    btn.textContent = 'Continuar: Bajar dificultad';
-    btn.addEventListener('click', ()=> cambiarDificultad(-1));
+    if (pct >= 90){
+      btn.textContent = 'Continuar: Subir dificultad';
+      btn.addEventListener('click', ()=> cambiarDificultad(+1));
+    } else if (pct >= 70){
+      btn.textContent = 'Continuar: Repetir nivel';
+      btn.addEventListener('click', ()=> btnComenzar.click());
+    } else if (pct >= 50){
+      btn.textContent = 'Continuar: Reforzar este nivel';
+      btn.addEventListener('click', ()=> btnComenzar.click());
+    } else {
+      btn.textContent = 'Continuar: Bajar dificultad';
+      btn.addEventListener('click', ()=> cambiarDificultad(-1));
+    }
+    finalActions.appendChild(btn);
+
+    // Botón secundario: Elegir otro juego
+    const linkOtroJuego = document.createElement('a');
+    linkOtroJuego.href = 'https://falltem.org/juegos/#games-cards';
+    linkOtroJuego.className = 'btn secundario';
+    linkOtroJuego.textContent = 'Elegir otro juego';
+    linkOtroJuego.target = '_blank';
+    linkOtroJuego.rel = 'noopener noreferrer';
+    finalActions.appendChild(linkOtroJuego);
+
+    // Link pequeño: Elegir otra configuración
+    const linkConfig = document.createElement('a');
+    linkConfig.href = '#';
+    linkConfig.textContent = '⚙️ Elegir otra configuración';
+    linkConfig.addEventListener('click', (e)=> {
+      e.preventDefault();
+      btnReiniciar.click();
+    });
+    finalActions.appendChild(linkConfig);
+
+    finalActions.hidden = false;
+    btn.focus();
   }
-  finalActions.appendChild(btn);
-
-  // Botón secundario: Elegir otro juego
-  const linkOtroJuego = document.createElement('a');
-  linkOtroJuego.href = 'https://falltem.org/juegos/#games-cards';
-  linkOtroJuego.className = 'btn secundario';
-  linkOtroJuego.textContent = 'Elegir otro juego';
-  linkOtroJuego.target = '_blank';          // opcional: nueva pestaña
-  linkOtroJuego.rel = 'noopener noreferrer';// seguridad/perform.
-  finalActions.appendChild(linkOtroJuego);
-
-  // Link pequeño: Elegir otra configuración
-  const linkConfig = document.createElement('a');
-  linkConfig.href = '#';
-  linkConfig.textContent = '⚙️ Elegir otra configuración';
-  linkConfig.addEventListener('click', (e)=> {
-    e.preventDefault();
-    btnReiniciar.click();
-  });
-  finalActions.appendChild(linkConfig);
-
-  finalActions.hidden = false;
-  btn.focus();
-}
-
 
   function finalizarSesion(){
     const tiempoPromedio = (rondasTotales > 0) ? Math.round(totalTiempoAcumuladoMs / rondasTotales) : null;
@@ -252,23 +242,48 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ======================================================
-  // FLUJO DE JUEGO
+  // FLUJO DE JUEGO (4 operaciones)
   // ======================================================
   function nuevaPregunta(){
-    const [min, max] = rangoPorDificultad();
-    const op = elegirOperacion();
+    const op = operacion; // ya no hay "mixto"
+
+    // rangos base (suma/resta)
+    let [min, max] = rangoPorDificultad();
+
+    // ajustar rangos para multiplicación/división (tablas)
+    if (op === 'multi' || op === 'divi'){
+      if (dificultad === 'facil') { min = 0; max = 10; }
+      else if (dificultad === 'medio') { min = 0; max = 12; }
+      else { min = 0; max = 15; }
+    }
+
     let a = rand(min, max), b = rand(min, max);
 
     if (op === 'resta'){
       if (b > a) [a,b] = [b,a];
       respuestaCorrecta = a - b;
       setTxt(enunciado, `${a} − ${b} = ?`);
+    } else if (op === 'multi'){
+      respuestaCorrecta = a * b;
+      setTxt(enunciado, `${a} × ${b} = ?`);
+    } else if (op === 'divi'){
+      b = Math.max(1, b);
+      const prod = a * b;
+      respuestaCorrecta = a;
+      setTxt(enunciado, `${prod} ÷ ${b} = ?`);
     } else {
       respuestaCorrecta = a + b;
       setTxt(enunciado, `${a} + ${b} = ?`);
     }
 
-    const distractores = generarDistractores(respuestaCorrecta, min, max).slice(0, 6);
+    // rango de distractores según operación
+    const resMin = 0;
+    const resMax = (op === 'multi') ? (max * max)
+                  : (op === 'divi') ? max
+                  : (op === 'resta') ? max
+                  : (max + max);
+
+    const distractores = generarDistractores(respuestaCorrecta, resMin, resMax).slice(0, 6);
     const opciones = barajar([respuestaCorrecta, ...barajar(distractores).slice(0,3)]);
 
     limpiarEstadosOpciones();
@@ -280,7 +295,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     actualizarUI();
     showTimer();
-    startTimer(tiempoPorDificultad());
+
+    const base = tiempoBasePorDificultad();
+    const extraOp = (op === 'multi' || op === 'divi') ? 2000 : 0;
+    startTimer(base + extraOp);
   }
 
   function actualizarUI(){
@@ -342,7 +360,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // EVENTOS
   // ======================================================
   btnComenzar.addEventListener('click', ()=>{
-    operacion = opSel.value;
+    operacion = opSel.value;                 // 'suma' | 'resta' | 'multi' | 'divi'
     dificultad = difSel.value;
     rondasTotales = Number(ronSel.value);
 
@@ -386,9 +404,10 @@ document.addEventListener('DOMContentLoaded', () => {
     finalActions.hidden = true;
   });
 
+  // Restaurar prefs
   try{
     const op = localStorage.getItem('calc_op');
-    if (op && ['suma','resta','mixto'].includes(op)) opSel.value = op;
+    if (op && ['suma','resta','multi','divi'].includes(op)) opSel.value = op;
 
     const df = localStorage.getItem('calc_diff');
     if (df && ['facil','medio','avanzado'].includes(df)) difSel.value = df;
@@ -475,5 +494,3 @@ document.addEventListener('DOMContentLoaded', () => {
   hideTimer();
   finalActions.hidden = true;
 });
-
-

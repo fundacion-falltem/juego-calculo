@@ -1,12 +1,9 @@
 /* ======================================================
    FALLTEM — Cálculo amable (web + mobile)
-   Versión mejorada (secciones ordenadas)
+   Versión estable (4 operaciones, sin Mixto)
    ====================================================== */
 
-
-/* ======================================================
-   1) VARIABLES / TEMA
-   ====================================================== */
+/* ===== Variables de tema ===== */
 :root{
   color-scheme: light dark;
   --fs-base: clamp(18px, 1.05vw + 14px, 22px);
@@ -24,21 +21,16 @@
   --ok:#16a34a; --bad:#dc2626;
 }
 [data-theme="light"]{
-  --bg:#f8fbf4; --fg:#1b1b1b; --muted:#374151; /* más legible en light */
+  --bg:#f8fbf4; --fg:#1b1b1b; --muted:#374151;
   --card:#ffffff; --border:#e5e7eb; --focus:#5fcbe0;
 
   /* FABs con fondo oscuro y texto CLARO */
   --btn-sec-bg:#1b2325;
-  --btn-sec-fg:#eaf6ff;   /* o #ffffff */
+  --btn-sec-fg:#eaf6ff;
 }
-.fixed-top-right .btn-ayuda{
-  text-shadow: 0 1px 1px rgba(0,0,0,.35);
-}
+.fixed-top-right .btn-ayuda{ text-shadow:0 1px 1px rgba(0,0,0,.35) }
 
-
-/* ======================================================
-   2) BASE / LAYOUT
-   ====================================================== */
+/* ===== Base ===== */
 *{ box-sizing:border-box }
 html,body{ height:100% }
 html{ -webkit-text-size-adjust:100%; text-size-adjust:100% }
@@ -53,10 +45,7 @@ body{
 .header h1{ font-size: clamp(2rem, 1.4vw + 1.6rem, 2.6rem); margin:.4rem 0 0; font-weight:900; letter-spacing:.2px }
 .intro{ margin:.5rem 0 var(--space) }
 
-
-/* ======================================================
-   3) TARJETA / CONTENEDORES
-   ====================================================== */
+/* ===== Tarjeta ===== */
 .card{
   background: var(--card);
   border: 1px solid var(--border);
@@ -67,14 +56,14 @@ body{
   box-shadow: 0 2px 10px rgba(0,0,0,.06);
 }
 
-
 /* ======================================================
-   4) CONTROLES (selects + botones de cabecera)
+   CONTROLES
    ====================================================== */
 .controles{
   display:grid;
   grid-template-columns: 1fr;
-  gap: .9rem 1rem; align-items:end;
+  gap: .9rem 1rem;
+  align-items:end;
   margin-bottom: calc(var(--space) * 1.1);
 }
 .control label{ display:block; font-weight:900; margin-bottom:.35rem }
@@ -88,19 +77,36 @@ select{
   background-repeat:no-repeat; background-position:right 1rem center; background-size:1rem; padding-right:2.4rem;
 }
 
-/* Botonera de controles */
+/* Botonera */
 .control.buttons{
-  display:flex; gap:.9rem; flex-wrap:wrap;
-  justify-content:center; align-items:center;
+  display:block;
+  grid-column: 1 / -1;
+}
+.control.buttons .btn{
+  width:100%;
+  min-width:0;
+  padding-block:1.1rem;
+  border-radius:18px;
 }
 
+/* Desktop: 3 selects en fila, botón debajo */
+@media (min-width: 700px){
+  .controles{
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    gap: 1.1rem;
+  }
+  .control.buttons{
+    grid-column: 1 / -1;
+    margin-top:.4rem;
+  }
+}
 
 /* ======================================================
-   5) BOTONES (base)
+   BOTONES
    ====================================================== */
 .btn{
   border:0; border-radius:14px; cursor:pointer; font-weight:900;
-  padding:.95rem 1.2rem; min-height:50px; font-size:1.06rem;
+  padding:1rem 1.2rem; min-height:50px; font-size:1.06rem;
   transition: transform .08s ease, filter .15s ease, box-shadow .15s ease, background-color .15s ease;
 }
 .btn:hover{ filter:brightness(1.05); transform: translateY(-1px) }
@@ -108,61 +114,22 @@ select{
 .btn.principal{ background:var(--btn-primary-bg); color:var(--btn-primary-fg) }
 .btn.secundario{ background:var(--btn-sec-bg); color:var(--btn-sec-fg) }
 
-
 /* ======================================================
-   6) RESPONSIVE DE CONTROLES
+   JUEGO
    ====================================================== */
-@media (min-width: 900px){
-  .controles{
-    grid-template-columns: repeat(3, minmax(220px, 1fr));
-  }
-  .control.buttons{
-    grid-column: 1 / -1;
-    justify-content:center;
-    margin-top: .2rem;
-  }
-  .control.buttons .btn{ min-width: 220px; }
-}
-
-
-/* ======================================================
-   7) JUEGO — SECCIÓN CENTRAL
-   ====================================================== */
-
-/* Tarjeta de la práctica: más protagonista y estrecha */
-.juego .card{
-  padding: clamp(16px, 2.6vw, 28px);
-  max-width: 720px;
-  margin-inline: auto;
-}
-
-/* Meta (tiempo / ronda) cerca del enunciado */
-.juego .meta{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  font-weight:800;
-  margin:.2rem 0 .4rem;
-  opacity:.9;
-}
-
-/* Barra de progreso general */
 .juego .progresoBar{
   height:10px; background: color-mix(in oklab, var(--border) 80%, transparent);
   border-radius:999px; overflow:hidden; margin-bottom:.9rem;
 }
 #pbFill{ height:100%; width:0%; background:var(--btn-primary-bg); transition: width .25s ease }
 
-/* Enunciado más jerárquico y centrado */
 .enunciado{
   font-size: clamp(2rem, 2.2vw + 1.2rem, 3rem);
-  font-weight:900;
-  text-align:center;
-  letter-spacing:0;
+  font-weight:900; text-align:center; letter-spacing:0;
   margin:.4rem 0 1.1rem;
 }
 
-/* Opciones múltiples (A–D) */
+/* Opciones */
 .opciones{
   display:grid; grid-template-columns: 1fr; gap:1rem; margin-top:.6rem;
 }
@@ -170,8 +137,7 @@ select{
   .opciones{ grid-template-columns: 1fr 1fr; }
 }
 .opcion-btn{
-  text-align:left;
-  display:flex; align-items:center; gap:.6rem;
+  text-align:left; display:flex; align-items:center; gap:.6rem;
   background:var(--card); color:var(--fg);
   border:2px solid var(--border); border-radius: 14px;
   padding:1rem 1.1rem; font-weight:800; font-size: clamp(1.05rem, 0.6vw + 1rem, 1.25rem);
@@ -181,22 +147,15 @@ select{
 .opcion-btn strong{ margin-right:.4rem }
 .opcion-btn:hover{ filter:brightness(1.06); transform:translateY(-1px); }
 .opcion-btn:active{ transform: translateY(0); }
-
-/* foco accesible y consistente */
 .opcion-btn:focus-visible{
-  outline:none;
-  border-color:var(--focus);
+  outline:none; border-color:var(--focus);
   box-shadow:0 0 0 3px color-mix(in oklab, var(--focus) 45%, transparent);
 }
-
-/* Estado seleccionado previo al veredicto */
 .opcion-btn.is-selected{
   border-color: var(--focus);
   box-shadow: 0 0 0 3px color-mix(in oklab, var(--focus) 35%, transparent);
   background: color-mix(in oklab, var(--focus) 10%, var(--card));
 }
-
-/* Feedback final (ok/bad) */
 .opcion-btn.ok{
   border-color:var(--ok);
   box-shadow:0 0 0 3px color-mix(in oklab, var(--ok) 35%, transparent);
@@ -208,16 +167,12 @@ select{
   background: color-mix(in oklab, var(--bad) 8%, var(--card));
 }
 
-
-/* ======================================================
-   8) TIMER
-   ====================================================== */
+/* Timer */
 .timer-text{ margin:.35rem 0 .25rem; font-weight:800; opacity:.95 }
 .timerBar{
   height:8px; background: color-mix(in oklab, var(--border) 80%, transparent);
   border-radius:999px; overflow:hidden; margin-bottom:.6rem;
 }
-/* degradé de urgencia según data-level: normal|warn|alert */
 #timerFill{
   height:100%; width:0%;
   background: var(--btn-sec-bg);
@@ -231,32 +186,12 @@ select{
   @keyframes pulse{ 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
 }
 
-
-/* ======================================================
-   9) MENSAJES / FEEDBACK FINAL
-   ====================================================== */
-.feedback{
-  margin-top: .8rem;
-  font-weight: 800;
-}
-.feedback.ok{ color: var(--ok); }
-.feedback.bad{ color: var(--bad); }
-.feedback.muted{ color: var(--muted); }
-
-
-/* ======================================================
-   10) CTAs (acciones al final de sesión)
-   ====================================================== */
+/* Cierre: botones CTA */
 .cta-buttons{
-  display: flex;
-  flex-wrap: wrap;
-  gap: .6rem;
-  margin-top: 1rem;
-  justify-content: center;
+  display:flex; flex-direction:column; align-items:center; gap:.75rem;
+  margin-top:1rem;
 }
-
-/* ===== Botón secundario en finalActions ===== */
-#finalActions .btn.secundario {
+#finalActions .btn.secundario{
   background: var(--btn-sec-bg);
   color: var(--btn-sec-fg);
   min-width: 220px;
@@ -268,19 +203,11 @@ select{
   box-shadow: 0 2px 6px rgba(0,0,0,.08);
   transition: transform .08s ease, filter .15s ease, box-shadow .15s ease;
 }
-
-#finalActions .btn.secundario:hover {
-  filter: brightness(1.05);
-  transform: translateY(-1px);
-}
-
-#finalActions .btn.secundario:focus-visible {
-  outline: 3px solid var(--focus);
-  outline-offset: 2px;
-}
+#finalActions .btn.secundario:hover{ filter:brightness(1.05); transform:translateY(-1px); }
+#finalActions a[href^="#"]{ color:var(--muted); text-decoration:none; font-weight:700 }
 
 /* ======================================================
-   11) FABs (AYUDA + TEMA)
+   FABs (ayuda + tema) arriba derecha
    ====================================================== */
 .fixed-top-right{
   position: fixed;
@@ -289,7 +216,6 @@ select{
   z-index: 10;
   display:flex; flex-direction:column; gap:12px;
 }
-
 /* Ayuda (?) */
 .btn-ayuda{
   width:56px; height:56px; border-radius:50%;
@@ -299,28 +225,21 @@ select{
   box-shadow:0 4px 14px rgba(0,0,0,.25);
 }
 .btn-ayuda:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
-
-/* Tema (ícono con ::before; sin texto) */
+/* Tema */
 .btn-theme{
   width:56px; height:56px; border-radius:50%;
   border:0; cursor:pointer; line-height:1;
   display:inline-flex; align-items:center; justify-content:center;
   background:var(--btn-sec-bg); color:var(--btn-sec-fg);
   box-shadow:0 4px 14px rgba(0,0,0,.25);
-  font-size:0; /* ocultar texto si lo hubiese */
+  font-size:0;
 }
 .btn-theme:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
-/* Icono según tema */
-[data-theme="light"] .btn-theme::before{
-  content:"🌙"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35));
-}
-[data-theme="dark"] .btn-theme::before{
-  content:"☀️"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35));
-}
-
+[data-theme="light"] .btn-theme::before{ content:"🌙"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35)); }
+[data-theme="dark"]  .btn-theme::before{ content:"☀️"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35)); }
 
 /* ======================================================
-   12) MODAL
+   Modal
    ====================================================== */
 .modal[hidden]{ display:none !important; }
 .modal{
@@ -339,9 +258,8 @@ select{
 }
 .modal-actions{ display:flex; gap:10px; justify-content:flex-end }
 
-
 /* ======================================================
-   13) FOOTER
+   Footer
    ====================================================== */
 .mini-credit{
   margin-top:.6rem; padding:.4rem 0;
@@ -351,9 +269,8 @@ select{
   display:flex; flex-direction:column; align-items:center; text-align:center;
 }
 
-
 /* ======================================================
-   14) ACCESIBILIDAD / PREFERENCIAS
+   Accesibilidad
    ====================================================== */
 .skip{ position:absolute; left:-9999px; top:auto }
 .skip:focus{
@@ -369,35 +286,4 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
 @media (prefers-reduced-motion: reduce){
   *{ scroll-behavior:auto }
   #pbFill{ transition:none }
-}
-
-/* ======================================================
-   CTAs de cierre (finalActions)
-   ====================================================== */
-
-#finalActions {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: .6rem;
-  margin-top: 1.2rem;
-}
-
-#finalActions .btn {
-  min-width: 220px;
-  padding: 1rem 1.4rem;
-  font-size: 1.1rem;
-}
-
-#finalActions a {
-  font-size: .9rem;
-  color: var(--muted);
-  text-decoration: none;
-  transition: color .15s ease;
-}
-
-#finalActions a:hover,
-#finalActions a:focus {
-  color: var(--focus);
-  text-decoration: underline;
 }
