@@ -81,9 +81,10 @@
 
     <!-- Controles -->
     <section class="card" aria-label="Controles">
-      <div class="controles">
+      <!-- contenedor preparado para grid/flex por CSS -->
+      <div class="controles" role="group" aria-label="Opciones del juego">
         <!-- Operación -->
-        <div class="control">
+        <div class="control control--operacion">
           <label for="operacion">Operación</label>
           <select id="operacion" aria-label="Elegir tipo de operación">
             <option value="suma" selected>Suma</option>
@@ -91,11 +92,10 @@
             <option value="multi">Multiplicación</option>
             <option value="divi">División</option>
           </select>
-
-          
+        </div>
 
         <!-- Dificultad -->
-        <div class="control">
+        <div class="control control--dificultad">
           <label for="dificultad">Dificultad</label>
           <select id="dificultad" aria-label="Elegir dificultad">
             <option value="facil" selected>Fácil (0–10)</option>
@@ -105,7 +105,7 @@
         </div>
 
         <!-- Rondas -->
-        <div class="control">
+        <div class="control control--rondas">
           <label for="rondas">Rondas</label>
           <select id="rondas" aria-label="Elegir número de rondas">
             <option value="6">6</option>
@@ -115,8 +115,8 @@
         </div>
 
         <!-- Botones -->
-        <div class="control buttons">
-          <button id="btnComenzar" class="btn principal" type="button">Comenzar</button>
+        <div class="control buttons control--acciones">
+          <button id="btnComenzar" class="btn principal" type="button" data-role="start">Comenzar</button>
           <button id="btnReiniciar" class="btn secundario" type="button" hidden>Volver a jugar</button>
         </div>
       </div>

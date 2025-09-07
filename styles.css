@@ -1,6 +1,6 @@
 /* ======================================================
    FALLTEM — Cálculo amable (web + mobile)
-   Versión estable (4 operaciones, sin Mixto)
+   Versión estable 
    ====================================================== */
 
 /* ===== Variables de tema ===== */
@@ -87,18 +87,6 @@ select{
   min-width:0;
   padding-block:1.1rem;
   border-radius:18px;
-}
-
-/* Desktop: 3 selects en fila, botón debajo */
-@media (min-width: 700px){
-  .controles{
-    grid-template-columns: repeat(3, minmax(220px, 1fr));
-    gap: 1.1rem;
-  }
-  .control.buttons{
-    grid-column: 1 / -1;
-    margin-top:.4rem;
-  }
 }
 
 /* ======================================================
@@ -286,4 +274,58 @@ html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
 @media (prefers-reduced-motion: reduce){
   *{ scroll-behavior:auto }
   #pbFill{ transition:none }
+}
+
+/* ======================================================
+   Parche layout Controles (móvil + escritorio)
+   ====================================================== */
+
+/* 1) MÓVIL: más espacio entre Rondas y Comenzar */
+@media (max-width: 699px){
+  .controles { gap: 1rem; }
+  .control--acciones { margin-top: 14px; }
+  .control--acciones .btn.principal { min-height: 56px; font-size: 1.1rem; }
+}
+
+/* 2) ESCRITORIO: 3 selects alineados en fila + botón centrado debajo */
+@media (min-width: 700px){
+  .controles{
+    display: grid;
+    grid-template-columns: repeat(3, minmax(220px, 1fr));
+    grid-template-areas:
+      "operacion rondas dificultad"
+      "acciones  acciones acciones";
+    gap: 1.1rem 1.4rem;
+    align-items: start;
+    max-width: 860px;
+    margin-inline: auto;
+  }
+
+  .control--operacion  { grid-area: operacion;  align-self: start; }
+  .control--rondas     { grid-area: rondas;     align-self: start; }
+  .control--dificultad { grid-area: dificultad; align-self: start; }
+  .control--acciones   {
+    grid-area: acciones;
+    display: flex;
+    justify-content: center;
+    gap: .8rem;
+    margin-top: .2rem;
+  }
+
+  .control--acciones .btn{ width: auto; }
+  .control--acciones .btn.principal{
+    min-width: 300px;
+    padding-block: 1.1rem;
+  }
+
+  .control select { width: 100%; }
+}
+
+/* 3) Micro-respiro entre select Rondas y botón */
+.control--rondas select{ margin-bottom: 2px; }
+
+/* 4) Foco visible claro en el botón principal */
+#btnComenzar:focus-visible{
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
 }
