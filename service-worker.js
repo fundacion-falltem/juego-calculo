@@ -24,6 +24,8 @@ self.addEventListener('activate', (event) => {
 
 self.addEventListener('fetch', (event) => {
   event.respondWith(
-    caches.match(event.request).then((r) => r || fetch(event.request))
+    // 👇 cambio mínimo: añadí { ignoreSearch: true }
+    caches.match(event.request, { ignoreSearch: true })
+      .then((r) => r || fetch(event.request))
   );
 });
