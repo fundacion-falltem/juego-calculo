@@ -15,10 +15,19 @@
                  base-uri 'none'; form-action 'none'">
 
   <title>Cálculo amable — Juegos Cognitivos</title>
-  <link rel="stylesheet" href="./styles.css?v=1.7.0">
+
+  <!-- PWA -->
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./images/icon-192.png" sizes="192x192">
+  <link rel="apple-touch-icon" href="./images/icon-192.png">
+
+  <link rel="stylesheet" href="./styles.css?v=1.9.1">
 </head>
 <body>
   <a href="#juego" class="skip">Saltar directamente al juego</a>
+
+  <!-- Región aria-live para lectores (no visible) -->
+  <div id="sr-updates" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
   <!-- FAB Ayuda + Tema -->
   <div class="fixed-top-right">
@@ -59,7 +68,7 @@
       <ul>
         <li>Hacelo en <strong>sesiones cortas</strong> (5–10 min), 2–3 veces por semana.</li>
         <li>Empezá en <strong>Fácil</strong> y subí la dificultad cuando te resulte cómodo.</li>
-        <li>Respondé con <strong>botones grandes</strong> o usando las teclas <strong>A–D</strong>.</li>
+        <li>Respondé con <strong>botones grandes</strong> o usando las teclas <strong>A–D</strong>, <strong>1–4</strong> o <strong>Enter</strong>.</li>
       </ul>
 
       <p class="muted aviso">
@@ -81,7 +90,6 @@
 
     <!-- Controles -->
     <section class="card" aria-label="Controles">
-      <!-- contenedor preparado para grid/flex por CSS -->
       <div class="controles" role="group" aria-label="Opciones del juego">
         <!-- Operación -->
         <div class="control control--operacion">
@@ -134,6 +142,11 @@
       <!-- Enunciado -->
       <p class="enunciado" id="enunciado" aria-live="polite">Presioná “Comenzar” para iniciar.</p>
 
+      <!-- Botón Pausa/Reanudar -->
+      <div style="display:flex; justify-content:center; margin:.4rem 0 .6rem;">
+        <button id="btnPause" class="btn secundario" type="button" hidden>Pausar</button>
+      </div>
+
       <!-- Opciones A–D -->
       <div id="opciones" class="opciones" role="group" aria-labelledby="enunciado">
         <!-- Se generan por JS -->
@@ -163,6 +176,6 @@
   </main>
 
   <noscript><p style="margin:1rem">Este juego necesita JavaScript para funcionar.</p></noscript>
-  <script src="app.js?v=1.7.0" defer></script>
+  <script src="app.js?v=1.9.1" defer></script>
 </body>
 </html>

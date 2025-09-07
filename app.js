@@ -1,7 +1,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const VERSION = "v1.8.0 (4 operaciones: + − × ÷)";
+  const VERSION = "v1.9.1 (accesibilidad, pausa, atajos, PWA)";
   const versionEl = document.getElementById('versionLabel');
   if (versionEl) versionEl.textContent = VERSION;
 
@@ -31,6 +31,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const finalActions = document.getElementById('finalActions');
 
+  // NUEVO
+  const srUpdates  = document.getElementById('sr-updates');
+  const btnPause   = document.getElementById('btnPause');
+
   // ======================================================
   // ESTADO
   // ======================================================
@@ -42,9 +46,13 @@ document.addEventListener('DOMContentLoaded', () => {
   // timer
   let timerId = null;
   let timeLeft = 0, timeMax = 0;
+  let paused = false;
 
   // métrica simple
   let totalTiempoAcumuladoMs = 0;
+
+  // handler de teclado por pregunta
+  let keyHandlerRef = null;
 
   // ======================================================
   // UTILS
@@ -52,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const rand = (min, max) => Math.floor(Math.random()*(max-min+1)) + min;
   const setTxt = (el, t) => { if (el) el.textContent = String(t); };
   const barajar = (arr) => { for (let i=arr.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [arr[i],arr[j]]=[arr[j],arr[i]]; } return arr; };
+  const announce = (msg) => { if (srUpdates) srUpdates.textContent = msg; };
 
   function rangoPorDificultad(){
     if (dificultad === 'facil') return [0, 10];
@@ -117,6 +126,19 @@ document.addEventListener('DOMContentLoaded', () => {
     timerFill.dataset.level = level;
   }
 
+  // Pausa/Reanudar
+  btnPause?.addEventListener('click', ()=>{
+    if (!paused) {
+      stopTimer();
+      btnPause.textContent = 'Reanudar';
+      paused = true;
+    } else {
+      startTimer(timeLeft);
+      btnPause.textContent = 'Pausar';
+      paused = false;
+    }
+  });
+
   // ======================================================
   // OPCIONES
   // ======================================================
@@ -125,10 +147,43 @@ document.addEventListener('DOMContentLoaded', () => {
       b.classList.remove('is-selected','ok','bad','marcada'); b.disabled = false;
     });
   }
+
   function marcarSeleccion(b){
     opcionesEl.querySelectorAll('button').forEach(x=>x.classList.remove('is-selected'));
     b.classList.add('is-selected');
   }
+
+  function attachKeyHandler(){
+    if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
+    keyHandlerRef = (e)=>{
+      if (!opcionesEl || opcionesEl.children.length === 0) return;
+
+      const buttons = Array.from(opcionesEl.children);
+      const letters = ['A','B','C','D'];
+      const key = e.key;
+      const up = ['ArrowUp','ArrowLeft'].includes(key);
+      const down = ['ArrowDown','ArrowRight'].includes(key);
+
+      // Letras A–D
+      const kU = key.toUpperCase();
+      const letterIdx = letters.indexOf(kU);
+      if (letterIdx >= 0 && buttons[letterIdx]) { buttons[letterIdx].click(); return; }
+
+      // Números 1–4
+      if (/^[1-4]$/.test(key)) { const idx = Number(key)-1; buttons[idx]?.click(); return; }
+
+      // Navegación con flechas
+      const current = opcionesEl.querySelector('.is-selected') || buttons[0];
+      let idx = buttons.indexOf(current);
+      if (up)   { idx = (idx - 1 + buttons.length) % buttons.length; buttons[idx].focus(); return; }
+      if (down) { idx = (idx + 1) % buttons.length; buttons[idx].focus(); return; }
+
+      // Activación
+      if (key === 'Enter' || key === ' ') { (opcionesEl.querySelector('.is-selected') || buttons[0])?.click(); return; }
+    };
+    document.addEventListener('keydown', keyHandlerRef);
+  }
+
   function renderOpciones(lista){
     const letras = ['A','B','C','D'];
     opcionesEl.innerHTML = '';
@@ -145,11 +200,7 @@ document.addEventListener('DOMContentLoaded', () => {
       b.addEventListener('click', ()=> elegir(val, b));
       opcionesEl.appendChild(b);
     });
-    document.addEventListener('keydown', (e)=>{
-      const k = e.key.toUpperCase();
-      const idx = ['A','B','C','D'].indexOf(k);
-      if (idx >= 0) opcionesEl.children[idx]?.click();
-    }, {once:true});
+    attachKeyHandler();
     opcionesEl.querySelector('button')?.focus();
   }
 
@@ -231,6 +282,11 @@ document.addEventListener('DOMContentLoaded', () => {
     setTxt(timerText, '');
     timerFill.style.width = '0%';
     timerFill.dataset.level = 'normal';
+
+    btnPause.hidden = true;
+    paused = false;
+
+    if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
   }
 
   function cambiarDificultad(delta){
@@ -245,7 +301,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // FLUJO DE JUEGO (4 operaciones)
   // ======================================================
   function nuevaPregunta(){
-    const op = operacion; // ya no hay "mixto"
+    const op = operacion;
 
     // rangos base (suma/resta)
     let [min, max] = rangoPorDificultad();
@@ -299,6 +355,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const base = tiempoBasePorDificultad();
     const extraOp = (op === 'multi' || op === 'divi') ? 2000 : 0;
     startTimer(base + extraOp);
+
+    // Mostrar pausa
+    btnPause.hidden = false;
+    btnPause.textContent = 'Pausar';
+    paused = false;
+
+    announce(`Nueva pregunta. ${enunciado.textContent}`);
   }
 
   function actualizarUI(){
@@ -328,9 +391,11 @@ document.addEventListener('DOMContentLoaded', () => {
       aciertos++;
       setTxt(feedback, '✔ ¡Correcto!');
       feedback.className = 'feedback ok';
+      announce(`Correcto. Respuesta ${valor}. Progreso ${ronda+1}/${rondasTotales}.`);
     } else {
       setTxt(feedback, `✘ Casi. Respuesta correcta: ${respuestaCorrecta}.`);
       feedback.className = 'feedback bad';
+      announce(`Incorrecto. La correcta era ${respuestaCorrecta}. Progreso ${ronda+1}/${rondasTotales}.`);
     }
 
     ronda++;
@@ -348,6 +413,8 @@ document.addEventListener('DOMContentLoaded', () => {
     feedback.className = 'feedback bad';
     totalTiempoAcumuladoMs += timeMax;
 
+    announce(`Tiempo agotado. La respuesta correcta era ${respuestaCorrecta}. Progreso ${ronda+1}/${rondasTotales}.`);
+
     ronda++;
     if (ronda >= rondasTotales){
       finalizarSesion();
@@ -360,7 +427,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // EVENTOS
   // ======================================================
   btnComenzar.addEventListener('click', ()=>{
-    operacion = opSel.value;                 // 'suma' | 'resta' | 'multi' | 'divi'
+    operacion = opSel.value;
     dificultad = difSel.value;
     rondasTotales = Number(ronSel.value);
 
@@ -402,6 +469,11 @@ document.addEventListener('DOMContentLoaded', () => {
     timerFill.dataset.level = 'normal';
 
     finalActions.hidden = true;
+
+    btnPause.hidden = true;
+    paused = false;
+
+    if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
   });
 
   // Restaurar prefs
@@ -417,7 +489,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }catch{}
 
   // ======================================================
-  // TEMA
+  // TEMA (oscuro/claro)
   // ======================================================
   function applyTheme(mode){
     const m = (mode === 'light' || mode === 'dark') ? mode : 'dark';
@@ -488,9 +560,19 @@ document.addEventListener('DOMContentLoaded', () => {
   document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeAbout(); });
 
   // ======================================================
+  // SW (PWA)
+  // ======================================================
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js').catch(()=>{ /* noop */ });
+    });
+  }
+
+  // ======================================================
   // INIT
   // ======================================================
   actualizarUI();
   hideTimer();
   finalActions.hidden = true;
+  btnPause.hidden = true;
 });
