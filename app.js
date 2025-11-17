@@ -130,11 +130,11 @@ document.addEventListener('DOMContentLoaded', () => {
   btnPause?.addEventListener('click', ()=>{
     if (!paused) {
       stopTimer();
-      btnPause.textContent = 'Reanudar';
+      if (btnPause) btnPause.textContent = 'Reanudar';
       paused = true;
     } else {
       startTimer(timeLeft);
-      btnPause.textContent = 'Pausar';
+      if (btnPause) btnPause.textContent = 'Pausar';
       paused = false;
     }
   });
@@ -283,7 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
     timerFill.style.width = '0%';
     timerFill.dataset.level = 'normal';
 
-    btnPause.hidden = true;
+    if (btnPause) btnPause.hidden = true;
     paused = false;
 
     if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
@@ -356,9 +356,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const extraOp = (op === 'multi' || op === 'divi') ? 2000 : 0;
     startTimer(base + extraOp);
 
-    // Mostrar pausa
-    btnPause.hidden = false;
-    btnPause.textContent = 'Pausar';
+    // Mostrar pausa (si existe el botón)
+    if (btnPause) {
+      btnPause.hidden = false;
+      btnPause.textContent = 'Pausar';
+    }
     paused = false;
 
     announce(`Nueva pregunta. ${enunciado.textContent}`);
@@ -470,7 +472,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     finalActions.hidden = true;
 
-    btnPause.hidden = true;
+    if (btnPause) btnPause.hidden = true;
     paused = false;
 
     if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
@@ -574,7 +576,7 @@ document.addEventListener('DOMContentLoaded', () => {
   actualizarUI();
   hideTimer();
   finalActions.hidden = true;
-  btnPause.hidden = true;
+  if (btnPause) btnPause.hidden = true;
 });
 
 /* ============================================================
