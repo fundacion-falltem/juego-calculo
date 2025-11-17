@@ -1,6 +1,6 @@
 /* ======================================================
    FALLTEM — Cálculo amable (web + mobile)
-   Versión estable 
+   Versión limpia 2025-11
    ====================================================== */
 
 /* ===== Variables de tema ===== */
@@ -20,6 +20,7 @@
 
   --ok:#16a34a; --bad:#dc2626;
 }
+
 [data-theme="light"]{
   --bg:#f8fbf4; --fg:#1b1b1b; --muted:#374151;
   --card:#ffffff; --border:#e5e7eb; --focus:#5fcbe0;
@@ -28,311 +29,529 @@
   --btn-sec-bg:#1b2325;
   --btn-sec-fg:#eaf6ff;
 }
-.fixed-top-right .btn-ayuda{ text-shadow:0 1px 1px rgba(0,0,0,.35) }
 
-/* ===== Base ===== */
-*{ box-sizing:border-box }
-html,body{ height:100% }
-html{ -webkit-text-size-adjust:100%; text-size-adjust:100% }
-body{
-  margin:0; background:var(--bg); color:var(--fg);
-  font-family:var(--font); font-size:var(--fs-base); line-height:1.65;
-  -webkit-tap-highlight-color: transparent;
-}
-.wrap{ max-width:980px; width:min(980px, calc(100% - 2*var(--space))); margin:0 auto; padding:var(--space) }
-
-.header{ margin-inline:auto; max-width: 860px; }
-.header h1{ font-size: clamp(2rem, 1.4vw + 1.6rem, 2.6rem); margin:.4rem 0 0; font-weight:900; letter-spacing:.2px }
-.intro{ margin:.5rem 0 var(--space) }
-
-/* ===== Tarjeta ===== */
-.card{
-  background: var(--card);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: clamp(12px, 2.2vw, 20px);
-  margin: 10px auto;
-  max-width: 860px;
-  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+.fixed-top-right .btn-ayuda{
+  text-shadow:0 1px 1px rgba(0,0,0,.35);
 }
 
 /* ======================================================
-   CONTROLES
+   Base
+   ====================================================== */
+*{ box-sizing:border-box }
+html,body{ height:100% }
+html{ -webkit-text-size-adjust:100%; text-size-adjust:100% }
+
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--fg);
+  font-family:var(--font);
+  font-size:var(--fs-base);
+  line-height:1.65;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.wrap{
+  max-width:980px;
+  width:min(980px, calc(100% - 2*var(--space)));
+  margin:0 auto;
+  padding:var(--space);
+}
+
+/* ======================================================
+   Header
+   ====================================================== */
+.header{
+  margin-inline:auto;
+  max-width:860px;
+}
+.header h1{
+  font-size:clamp(2rem, 1.4vw + 1.6rem, 2.6rem);
+  margin:.4rem 0 0;
+  font-weight:900;
+  letter-spacing:.2px;
+}
+.intro{
+  margin:.5rem 0 var(--space);
+}
+
+/* ======================================================
+   Tarjetas
+   ====================================================== */
+.card{
+  background:var(--card);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:clamp(12px, 2.2vw, 20px);
+  margin:10px auto;
+  max-width:860px;
+  box-shadow:0 2px 10px rgba(0,0,0,.06);
+}
+
+/* ======================================================
+   Controles
    ====================================================== */
 .controles{
   display:grid;
-  grid-template-columns: 1fr;
-  gap: .9rem 1rem;
+  grid-template-columns:1fr;
+  gap:.9rem 1rem;
   align-items:end;
-  margin-bottom: calc(var(--space) * 1.1);
+  margin-bottom:calc(var(--space) * 1.1);
 }
-.control label{ display:block; font-weight:900; margin-bottom:.35rem }
 
+.control label{
+  display:block;
+  font-weight:900;
+  margin-bottom:.35rem;
+}
+
+/* Selects */
 select{
-  appearance:none; -webkit-appearance:none; -moz-appearance:none;
-  background:var(--card); color:var(--fg);
-  border:1px solid var(--border); border-radius:.9rem;
-  padding:.85rem 1rem; width:100%; font-size:1.05rem;
+  appearance:none;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  background:var(--card);
+  color:var(--fg);
+  border:1px solid var(--border);
+  border-radius:.9rem;
+  padding:.85rem 1rem;
+  width:100%;
+  font-size:1.05rem;
   background-image:url("data:image/svg+xml;utf8,<svg fill='currentColor' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5.5 7l4.5 5 4.5-5z'/></svg>");
-  background-repeat:no-repeat; background-position:right 1rem center; background-size:1rem; padding-right:2.4rem;
+  background-repeat:no-repeat;
+  background-position:right 1rem center;
+  background-size:1rem;
+  padding-right:2.4rem;
 }
 
-/* Botonera */
+select:focus-visible{
+  outline:3px solid var(--focus);
+  outline-offset:3px;
+}
+
+/* Botonera de controles */
 .control.buttons{
   display:block;
-  grid-column: 1 / -1;
+  grid-column:1 / -1;
 }
 .control.buttons .btn{
   width:100%;
   min-width:0;
-  padding-block:1.1rem;
+  padding-block:0.95rem;
   border-radius:18px;
 }
 
+/* Layout responsive de controles */
+@media (min-width:720px){
+  .controles{
+    grid-template-columns:repeat(4, minmax(0, 1fr));
+  }
+}
+
 /* ======================================================
-   BOTONES
+   Botones genéricos
    ====================================================== */
 .btn{
-  border:0; border-radius:14px; cursor:pointer; font-weight:900;
-  padding:1rem 1.2rem; min-height:50px; font-size:1.06rem;
-  transition: transform .08s ease, filter .15s ease, box-shadow .15s ease, background-color .15s ease;
+  border:0;
+  border-radius:14px;
+  cursor:pointer;
+  font-weight:900;
+  padding:0.85rem 1.15rem;
+  min-height:46px;
+  font-size:1.02rem;
+  transition:
+    transform .08s ease,
+    filter .15s ease,
+    box-shadow .15s ease,
+    background-color .15s ease;
 }
-.btn:hover{ filter:brightness(1.05); transform: translateY(-1px) }
-.btn:focus-visible{ outline:3px solid var(--focus); outline-offset:3px }
-.btn.principal{ background:var(--btn-primary-bg); color:var(--btn-primary-fg) }
-.btn.secundario{ background:var(--btn-sec-bg); color:var(--btn-sec-fg) }
+
+.btn:hover{
+  filter:brightness(1.05);
+  transform:translateY(-1px);
+}
+.btn:active{
+  transform:translateY(0);
+}
+.btn:focus-visible{
+  outline:3px solid var(--focus);
+  outline-offset:3px;
+}
+
+.btn.principal{
+  background:var(--btn-primary-bg);
+  color:var(--btn-primary-fg);
+}
+.btn.secundario{
+  background:var(--btn-sec-bg);
+  color:var(--btn-sec-fg);
+}
+
+/* Separación vertical entre botones de "Comenzar" y "Volver a jugar" */
+.control.buttons{
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem; /* ← separación entre botones */
+}
 
 /* ======================================================
-   JUEGO
+   Juego
    ====================================================== */
 .juego .progresoBar{
-  height:10px; background: color-mix(in oklab, var(--border) 80%, transparent);
-  border-radius:999px; overflow:hidden; margin-bottom:.9rem;
+  height:10px;
+  background:color-mix(in oklab, var(--border) 80%, transparent);
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:.9rem;
 }
-#pbFill{ height:100%; width:0%; background:var(--btn-primary-bg); transition: width .25s ease }
+#pbFill{
+  height:100%;
+  width:0%;
+  background:var(--btn-primary-bg);
+  transition:width .25s ease;
+}
 
+/* Timer */
+.timer-text{
+  margin:.35rem 0 .25rem;
+  font-weight:800;
+  opacity:.95;
+}
+.timerBar{
+  height:8px;
+  background:color-mix(in oklab, var(--border) 80%, transparent);
+  border-radius:999px;
+  overflow:hidden;
+  margin-bottom:.6rem;
+}
+#timerFill{
+  height:100%;
+  width:0%;
+  background:var(--btn-sec-bg);
+  transition:width .10s linear, background-color .15s ease;
+}
+#timerFill[data-level="warn"]{
+  background:#f59e0b;
+}
+#timerFill[data-level="alert"]{
+  background:var(--bad);
+}
+.timer-alert{
+  color:var(--bad);
+  font-weight:900;
+}
+@media (prefers-reduced-motion:no-preference){
+  .timer-pulse{
+    animation:pulse .8s ease-in-out infinite;
+  }
+  @keyframes pulse{
+    0%{ transform:scale(1); }
+    50%{ transform:scale(1.06); }
+    100%{ transform:scale(1); }
+  }
+}
+
+/* Enunciado */
 .enunciado{
-  font-size: clamp(2rem, 2.2vw + 1.2rem, 3rem);
-  font-weight:900; text-align:center; letter-spacing:0;
+  font-size:clamp(2rem, 2.2vw + 1.2rem, 3rem);
+  font-weight:900;
+  text-align:center;
+  letter-spacing:0;
   margin:.4rem 0 1.1rem;
 }
 
-/* Opciones */
+/* Opciones de respuesta */
 .opciones{
-  display:grid; grid-template-columns: 1fr; gap:1rem; margin-top:.6rem;
+  display:grid;
+  grid-template-columns:1fr;
+  gap:1rem;
+  margin-top:.6rem;
 }
-@media (min-width: 700px){
-  .opciones{ grid-template-columns: 1fr 1fr; }
+@media (min-width:700px){
+  .opciones{
+    grid-template-columns:1fr 1fr;
+  }
 }
+
 .opcion-btn{
-  text-align:left; display:flex; align-items:center; gap:.6rem;
-  background:var(--card); color:var(--fg);
-  border:2px solid var(--border); border-radius: 14px;
-  padding:1rem 1.1rem; font-weight:800; font-size: clamp(1.05rem, 0.6vw + 1rem, 1.25rem);
-  cursor:pointer; box-shadow:0 2px 6px rgba(0,0,0,.08);
-  transition: transform .12s ease, filter .15s ease, border-color .15s ease, box-shadow .15s ease, background-color .15s ease;
+  text-align:left;
+  display:flex;
+  align-items:center;
+  gap:.6rem;
+  background:var(--card);
+  color:var(--fg);
+  border:2px solid var(--border);
+  border-radius:14px;
+  padding:1rem 1.1rem;
+  font-weight:800;
+  font-size:clamp(1.05rem, 0.6vw + 1rem, 1.25rem);
+  cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  transition:
+    transform .12s ease,
+    filter .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease,
+    background-color .15s ease;
 }
-.opcion-btn strong{ margin-right:.4rem }
-.opcion-btn:hover{ filter:brightness(1.06); transform:translateY(-1px); }
-.opcion-btn:active{ transform: translateY(0); }
+
+.opcion-btn strong{
+  margin-right:.4rem;
+}
+
+.opcion-btn:hover{
+  filter:brightness(1.06);
+  transform:translateY(-1px);
+}
+.opcion-btn:active{
+  transform:translateY(0);
+}
 .opcion-btn:focus-visible{
-  outline:none; border-color:var(--focus);
+  outline:none;
+  border-color:var(--focus);
   box-shadow:0 0 0 3px color-mix(in oklab, var(--focus) 45%, transparent);
 }
 .opcion-btn.is-selected{
-  border-color: var(--focus);
-  box-shadow: 0 0 0 3px color-mix(in oklab, var(--focus) 35%, transparent);
-  background: color-mix(in oklab, var(--focus) 10%, var(--card));
+  border-color:var(--focus);
+  box-shadow:0 0 0 3px color-mix(in oklab, var(--focus) 35%, transparent);
+  background:color-mix(in oklab, var(--focus) 10%, var(--card));
 }
 .opcion-btn.ok{
   border-color:var(--ok);
   box-shadow:0 0 0 3px color-mix(in oklab, var(--ok) 35%, transparent);
-  background: color-mix(in oklab, var(--ok) 12%, var(--card));
+  background:color-mix(in oklab, var(--ok) 12%, var(--card));
 }
 .opcion-btn.bad{
   border-color:var(--bad);
   box-shadow:0 0 0 3px color-mix(in oklab, var(--bad) 35%, transparent);
-  background: color-mix(in oklab, var(--bad) 8%, var(--card));
+  background:color-mix(in oklab, var(--bad) 8%, var(--card));
 }
 
-/* Timer */
-.timer-text{ margin:.35rem 0 .25rem; font-weight:800; opacity:.95 }
-.timerBar{
-  height:8px; background: color-mix(in oklab, var(--border) 80%, transparent);
-  border-radius:999px; overflow:hidden; margin-bottom:.6rem;
+/* Feedback + estado */
+.feedback{
+  margin-top:.6rem;
+  text-align:center;
+  min-height:1.4em;
 }
-#timerFill{
-  height:100%; width:0%;
-  background: var(--btn-sec-bg);
-  transition: width .10s linear, background-color .15s ease;
-}
-#timerFill[data-level="warn"]  { background:#f59e0b; }
-#timerFill[data-level="alert"] { background:var(--bad); }
-.timer-alert{ color: var(--bad); font-weight:900 }
-@media (prefers-reduced-motion: no-preference){
-  .timer-pulse{ animation: pulse .8s ease-in-out infinite }
-  @keyframes pulse{ 0%{transform:scale(1)} 50%{transform:scale(1.06)} 100%{transform:scale(1)} }
+.feedback.muted{
+  color:var(--muted);
 }
 
-/* Cierre: botones CTA */
+.estado p{
+  margin:0;
+  text-align:center;
+}
+
+/* ======================================================
+   Cierre: botones CTA finales
+   ====================================================== */
 .cta-buttons{
-  display:flex; flex-direction:column; align-items:center; gap:.75rem;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:.75rem;
   margin-top:1rem;
 }
 #finalActions .btn.secundario{
-  background: var(--btn-sec-bg);
-  color: var(--btn-sec-fg);
-  min-width: 220px;
-  padding: 1rem 1.4rem;
-  font-size: 1.05rem;
-  border-radius: 14px;
-  font-weight: 900;
-  text-align: center;
-  box-shadow: 0 2px 6px rgba(0,0,0,.08);
-  transition: transform .08s ease, filter .15s ease, box-shadow .15s ease;
+  background:var(--btn-sec-bg);
+  color:var(--btn-sec-fg);
+  min-width:220px;
+  padding:1rem 1.4rem;
+  font-size:1.05rem;
+  border-radius:14px;
+  font-weight:900;
+  text-align:center;
+  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  transition:transform .08s ease, filter .15s ease, box-shadow .15s ease;
 }
-#finalActions .btn.secundario:hover{ filter:brightness(1.05); transform:translateY(-1px); }
-#finalActions a[href^="#"]{ color:var(--muted); text-decoration:none; font-weight:700 }
+#finalActions .btn.secundario:hover{
+  filter:brightness(1.05);
+  transform:translateY(-1px);
+}
+#finalActions a[href^="#"]{
+  color:var(--muted);
+  text-decoration:none;
+  font-weight:700;
+}
 
 /* ======================================================
    FABs (ayuda + tema) arriba derecha
    ====================================================== */
 .fixed-top-right{
-  position: fixed;
-  top: calc(12px + env(safe-area-inset-top, 0px));
-  right: calc(12px + env(safe-area-inset-right, 0px));
-  z-index: 10;
-  display:flex; flex-direction:column; gap:12px;
+  position:fixed;
+  top:calc(12px + env(safe-area-inset-top, 0px));
+  right:calc(12px + env(safe-area-inset-right, 0px));
+  z-index:10;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
 }
-/* Ayuda (?) */
+
+/* Botón ayuda (?) */
 .btn-ayuda{
-  width:56px; height:56px; border-radius:50%;
-  border:0; cursor:pointer;
-  background:var(--btn-sec-bg); color:var(--btn-sec-fg);
-  font-weight:900; font-size:1.4rem; line-height:1;
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  border:0;
+  cursor:pointer;
+  background:var(--btn-sec-bg);
+  color:var(--btn-sec-fg);
+  font-weight:900;
+  font-size:1.4rem;
+  line-height:1;
   box-shadow:0 4px 14px rgba(0,0,0,.25);
 }
-.btn-ayuda:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
-/* Tema */
+.btn-ayuda:focus-visible{
+  outline:3px solid var(--focus);
+  outline-offset:2px;
+}
+
+/* Botón tema */
 .btn-theme{
-  width:56px; height:56px; border-radius:50%;
-  border:0; cursor:pointer; line-height:1;
-  display:inline-flex; align-items:center; justify-content:center;
-  background:var(--btn-sec-bg); color:var(--btn-sec-fg);
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  border:0;
+  cursor:pointer;
+  line-height:1;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  background:var(--btn-sec-bg);
+  color:var(--btn-sec-fg);
   box-shadow:0 4px 14px rgba(0,0,0,.25);
   font-size:0;
 }
-.btn-theme:focus-visible{ outline:3px solid var(--focus); outline-offset:2px }
-[data-theme="light"] .btn-theme::before{ content:"🌙"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35)); }
-[data-theme="dark"]  .btn-theme::before{ content:"☀️"; font-size:1.45rem; filter: drop-shadow(0 0 1px rgba(0,0,0,.35)); }
+.btn-theme:focus-visible{
+  outline:3px solid var(--focus);
+  outline-offset:2px;
+}
+[data-theme="light"] .btn-theme::before{
+  content:"🌙";
+  font-size:1.45rem;
+  filter:drop-shadow(0 0 1px rgba(0,0,0,.35));
+}
+[data-theme="dark"] .btn-theme::before{
+  content:"☀️";
+  font-size:1.45rem;
+  filter:drop-shadow(0 0 1px rgba(0,0,0,.35));
+}
 
 /* ======================================================
-   Modal
+   Modal de ayuda
    ====================================================== */
 .modal[hidden]{ display:none !important; }
 .modal{
-  position:fixed; inset:0;
-  display:flex; align-items:flex-start; justify-content:center;
+  position:fixed;
+  inset:0;
+  display:flex;
+  align-items:flex-start;
+  justify-content:center;
   padding:min(5vh,48px) 16px;
   background:rgba(0,0,0,.55);
   z-index:1000;
 }
 .modal-card{
-  width:min(820px,100%);
-  background:var(--card); color:var(--fg);
-  border:1px solid var(--border); border-radius:12px;
+  width:min(820px, 100%);
+  background:var(--card);
+  color:var(--fg);
+  border:1px solid var(--border);
+  border-radius:12px;
   box-shadow:0 12px 30px rgba(0,0,0,.35);
   padding:var(--space);
 }
-.modal-actions{ display:flex; gap:10px; justify-content:flex-end }
+.modal-actions{
+  display:flex;
+  gap:10px;
+  justify-content:flex-end;
+}
 
 /* ======================================================
    Footer
    ====================================================== */
 .mini-credit{
-  margin-top:.6rem; padding:.4rem 0;
+  margin-top:.6rem;
+  padding:.4rem 0;
   border-top:1px solid var(--border);
-  font-size:.65em; line-height:1.35; color:var(--muted);
-  max-width:980px; margin-inline:auto;
-  display:flex; flex-direction:column; align-items:center; text-align:center;
+  font-size:.65em;
+  line-height:1.35;
+  color:var(--muted);
+  max-width:980px;
+  margin-inline:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  text-align:center;
+}
+.mini-credit .mini-label{
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  font-weight:800;
+  font-size:.9em;
+  margin-right:.2em;
 }
 
 /* ======================================================
    Accesibilidad
    ====================================================== */
-.skip{ position:absolute; left:-9999px; top:auto }
+.skip{
+  position:absolute;
+  left:-9999px;
+  top:auto;
+}
 .skip:focus{
-  left:12px; top:12px; background:var(--btn-primary-bg); color:var(--btn-primary-fg);
-  padding:8px 10px; border-radius:8px; z-index:1000;
+  left:12px;
+  top:12px;
+  background:var(--btn-primary-bg);
+  color:var(--btn-primary-fg);
+  padding:8px 10px;
+  border-radius:8px;
+  z-index:1000;
 }
 
-.visually-hidden {
+.visually-hidden{
   position:absolute !important;
-  width:1px; height:1px;
-  margin:-1px; padding:0;
-  overflow:hidden; clip:rect(0 0 0 0); border:0;
+  width:1px;
+  height:1px;
+  margin:-1px;
+  padding:0;
+  overflow:hidden;
+  clip:rect(0 0 0 0);
+  border:0;
 }
 
-/* Tamaño muy grande */
-html.muy-grande{ font-size:125% }
-html.muy-grande body{ --fs-base: clamp(20px, 1.3vw + 16px, 24px) }
-
-/* Reduce motion */
-@media (prefers-reduced-motion: reduce){
-  *{ scroll-behavior:auto }
-  #pbFill{ transition:none }
+/* Tamaño muy grande (modo accesible extra) */
+html.muy-grande{
+  font-size:125%;
+}
+html.muy-grande body{
+  --fs-base:clamp(20px, 1.3vw + 16px, 24px);
 }
 
 /* ======================================================
-   Parche layout Controles (móvil + escritorio)
+   Ajustes pequeños extra
    ====================================================== */
 
-/* 1) MÓVIL: más espacio entre Rondas y Comenzar */
-@media (max-width: 699px){
-  .controles { gap: 1rem; }
-  .control--acciones { margin-top: 14px; }
-  .control--acciones .btn.principal { min-height: 56px; font-size: 1.1rem; }
+/* En pantallas muy chicas, que todo respire un poco mejor */
+@media (max-width:480px){
+  .card{
+    margin-inline:auto;
+  }
+  .header h1{
+    text-align:left;
+  }
+  .control.buttons .btn{
+    font-size:1.02rem;
+  }
 }
 
-/* 2) ESCRITORIO: 3 selects alineados en fila + botón centrado debajo */
-@media (min-width: 700px){
-  .controles{
-    display: grid;
-    grid-template-columns: repeat(3, minmax(220px, 1fr));
-    grid-template-areas:
-      "operacion rondas dificultad"
-      "acciones  acciones acciones";
-    gap: 1.1rem 1.4rem;
-    align-items: start;
-    max-width: 860px;
-    margin-inline: auto;
-  }
-
-  .control--operacion  { grid-area: operacion;  align-self: start; }
-  .control--rondas     { grid-area: rondas;     align-self: start; }
-  .control--dificultad { grid-area: dificultad; align-self: start; }
-  .control--acciones   {
-    grid-area: acciones;
-    display: flex;
-    justify-content: center;
-    gap: .8rem;
-    margin-top: .2rem;
-  }
-
-  .control--acciones .btn{ width: auto; }
-  .control--acciones .btn.principal{
-    min-width: 300px;
-    padding-block: 1.1rem;
-  }
-
-  .control select { width: 100%; }
+/* Micro-respiro entre select Rondas y botón */
+.control--rondas select{
+  margin-bottom:2px;
 }
 
-/* 3) Micro-respiro entre select Rondas y botón */
-.control--rondas select{ margin-bottom: 2px; }
-
-/* 4) Foco visible claro en el botón principal */
+/* Foco visible claro en el botón principal */
 #btnComenzar:focus-visible{
-  outline: 3px solid var(--focus);
-  outline-offset: 3px;
+  outline:3px solid var(--focus);
+  outline-offset:3px;
 }

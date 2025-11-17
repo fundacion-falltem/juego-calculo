@@ -576,3 +576,77 @@ document.addEventListener('DOMContentLoaded', () => {
   finalActions.hidden = true;
   btnPause.hidden = true;
 });
+
+/* ============================================================
+   CLOUD flare — Eventos personalizados para "Cálculo amable"
+   ============================================================ */
+
+/**
+ * Envía un evento personalizado a Cloudflare Web Analytics
+ * usando navigator.sendBeacon() para no bloquear la UI.
+ *
+ * @param {string} eventName — nombre del evento (string)
+ * @param {object} data — info extra opcional
+ */
+function track(eventName, data = {}) {
+  try {
+    const payload = {
+      event: eventName,
+      timestamp: Date.now(),
+      ...data,
+      // Token del sitio (el mismo que ya usás)
+      token: "96e0f7e2211041628691aed5f9d88f31"
+    };
+
+    navigator.sendBeacon(
+      "https://cloudflareinsights.com/beacon",
+      JSON.stringify(payload)
+    );
+  } catch (err) {
+    console.warn("Cloudflare track() error:", err);
+  }
+}
+
+/* ============================================================
+   EVENTOS AUTOMÁTICOS (podés borrarlos si no los querés)
+   Usá estos como plantillas según tu lógica del juego.
+   ============================================================ */
+
+/* Cuando el usuario toca "Comenzar" */
+document.getElementById("btnComenzar")?.addEventListener("click", () => {
+  track("calculo_comenzar", {
+    operacion: document.getElementById("operacion")?.value,
+    dificultad: document.getElementById("dificultad")?.value,
+    rondas: document.getElementById("rondas")?.value
+  });
+});
+
+/* Cuando finaliza una ronda correcta */
+function trackRespuestaCorrecta(valorCorrecto) {
+  track("calculo_respuesta_correcta", {
+    respuesta: valorCorrecto
+  });
+}
+
+/* Cuando finaliza una ronda incorrecta */
+function trackRespuestaIncorrecta(valorIncorrecto) {
+  track("calculo_respuesta_incorrecta", {
+    respuesta: valorIncorrecto
+  });
+}
+
+/* Cuando termina el juego completo */
+function trackFinDeJuego(stats) {
+  // stats puede contener: { aciertos, total, tiempoPromedio }
+  track("calculo_finalizado", stats);
+}
+
+/* Cuando el usuario cambia la operación */
+document.getElementById("operacion")?.addEventListener("change", (e) => {
+  track("calculo_cambio_operacion", { operacion: e.target.value });
+});
+
+/* Cuando cambia la dificultad */
+document.getElementById("dificultad")?.addEventListener("change", (e) => {
+  track("calculo_cambio_dificultad", { dificultad: e.target.value });
+});
