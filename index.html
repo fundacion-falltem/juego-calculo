@@ -9,18 +9,19 @@
   <meta name="referrer" content="strict-origin-when-cross-origin"/>
 
   <!-- CSP actualizada: permite Tailwind, Cloudflare y fuentes de Google -->
-  <meta http-equiv="Content-Security-Policy"
-        content="
-          default-src 'self';
-          script-src 'self' https://cdn.tailwindcss.com https://static.cloudflareinsights.com;
-          style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-          font-src 'self' https://fonts.gstatic.com;
-          img-src 'self' data:;
-          connect-src 'self';
-          object-src 'none';
-          base-uri 'none';
-          form-action 'none'
-        ">
+ <meta http-equiv="Content-Security-Policy"
+      content="
+        default-src 'self';
+        script-src 'self' https://cdn.tailwindcss.com https://static.cloudflareinsights.com;
+        connect-src 'self' https://cloudflareinsights.com https://*.cloudflareinsights.com;
+        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com;
+        img-src 'self' data:;
+        object-src 'none';
+        base-uri 'none';
+        form-action 'none'
+      ">
+
 
   <title>Cálculo amable — Juegos Cognitivos FALLTEM</title>
 
