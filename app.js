@@ -23,15 +23,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const progTxt    = document.getElementById('progTxt');
   const aciertosEl = document.getElementById('aciertos');
 
-  const themeBtn   = document.getElementById('themeToggle');
-
   const timerText  = document.getElementById('timerText');
   const timerFill  = document.getElementById('timerFill');
   const timerBar   = document.querySelector('.timerBar');
 
   const finalActions = document.getElementById('finalActions');
 
-  // NUEVO
+  // Accesibilidad + pausa
   const srUpdates  = document.getElementById('sr-updates');
   const btnPause   = document.getElementById('btnPause');
 
@@ -95,25 +93,48 @@ document.addEventListener('DOMContentLoaded', () => {
   // TIMER
   // ======================================================
   function showTimer(){
-    timerText.style.display = ''; timerText.setAttribute('aria-hidden','false');
-    timerBar.style.display  = ''; timerBar.setAttribute('aria-hidden','false');
+    timerText.style.display = '';
+    timerText.setAttribute('aria-hidden','false');
+    timerBar.style.display  = '';
+    timerBar.setAttribute('aria-hidden','false');
   }
+
   function hideTimer(){
-    timerText.style.display = 'none'; timerText.setAttribute('aria-hidden','true');
-    timerBar.style.display  = 'none'; timerBar.setAttribute('aria-hidden','true');
+    timerText.style.display = 'none';
+    timerText.setAttribute('aria-hidden','true');
+    timerBar.style.display  = 'none';
+    timerBar.setAttribute('aria-hidden','true');
   }
-  function stopTimer(){ if (timerId){ clearInterval(timerId); timerId = null; } }
+
+  function stopTimer(){
+    if (timerId){
+      clearInterval(timerId);
+      timerId = null;
+    }
+  }
+
   function startTimer(ms){
-    stopTimer(); timeMax = ms; timeLeft = ms; updateTimerUI();
+    stopTimer();
+    timeMax = ms;
+    timeLeft = ms;
+    updateTimerUI();
     timerId = setInterval(()=>{
       timeLeft -= 100;
-      if (timeLeft <= 0){ timeLeft = 0; updateTimerUI(); stopTimer(); tiempoAgotado(); }
-      else updateTimerUI();
+      if (timeLeft <= 0){
+        timeLeft = 0;
+        updateTimerUI();
+        stopTimer();
+        tiempoAgotado();
+      } else {
+        updateTimerUI();
+      }
     }, 100);
   }
+
   function updateTimerUI(){
     const s = Math.ceil(timeLeft / 1000);
     setTxt(timerText, s > 0 ? `Tiempo: ${s} s` : 'Tiempo: 0 s');
+
     const alerta = timeLeft <= 3000 && timeLeft > 0;
     timerText.classList.toggle('timer-alert', alerta);
     timerText.classList.toggle('timer-pulse', alerta);
@@ -122,7 +143,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const pct = Math.max(0, Math.min(100, Math.round((timeLeft / timeMax) * 100)));
     timerFill.style.width = pct + '%';
     let level = 'normal';
-    if (timeLeft > 0){ if (pct <= 15) level = 'alert'; else if (pct <= 35) level = 'warn'; }
+    if (timeLeft > 0){
+      if (pct <= 15) level = 'alert';
+      else if (pct <= 35) level = 'warn';
+    }
     timerFill.dataset.level = level;
   }
 
@@ -144,7 +168,8 @@ document.addEventListener('DOMContentLoaded', () => {
   // ======================================================
   function limpiarEstadosOpciones(){
     opcionesEl.querySelectorAll('button').forEach(b=>{
-      b.classList.remove('is-selected','ok','bad','marcada'); b.disabled = false;
+      b.classList.remove('is-selected','ok','bad','marcada');
+      b.disabled = false;
     });
   }
 
@@ -179,7 +204,10 @@ document.addEventListener('DOMContentLoaded', () => {
       if (down) { idx = (idx + 1) % buttons.length; buttons[idx].focus(); return; }
 
       // Activación
-      if (key === 'Enter' || key === ' ') { (opcionesEl.querySelector('.is-selected') || buttons[0])?.click(); return; }
+      if (key === 'Enter' || key === ' ') {
+        (opcionesEl.querySelector('.is-selected') || buttons[0])?.click();
+        return;
+      }
     };
     document.addEventListener('keydown', keyHandlerRef);
   }
@@ -264,13 +292,23 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   function finalizarSesion(){
-    const tiempoPromedio = (rondasTotales > 0) ? Math.round(totalTiempoAcumuladoMs / rondasTotales) : null;
-    const texto = cierreDeSesion({ aciertos, rondas: rondasTotales, tiempoPromedioMs: tiempoPromedio });
+    const tiempoPromedio = (rondasTotales > 0)
+      ? Math.round(totalTiempoAcumuladoMs / rondasTotales)
+      : null;
+
+    const texto = cierreDeSesion({
+      aciertos,
+      rondas: rondasTotales,
+      tiempoPromedioMs: tiempoPromedio
+    });
+
     const pct = Math.round((aciertos / Math.max(1, rondasTotales)) * 100);
 
     setTxt(enunciado, 'Sesión finalizada');
     setTxt(feedback, texto);
-    feedback.className = (pct >= 70) ? 'feedback ok' : (pct >= 50 ? 'feedback muted' : 'feedback bad');
+    feedback.className = (pct >= 70)
+      ? 'feedback ok'
+      : (pct >= 50 ? 'feedback muted' : 'feedback bad');
 
     renderFinalActions(pct);
 
@@ -308,9 +346,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // ajustar rangos para multiplicación/división (tablas)
     if (op === 'multi' || op === 'divi'){
-      if (dificultad === 'facil') { min = 0; max = 10; }
+      if (dificultad === 'facil')      { min = 0; max = 10; }
       else if (dificultad === 'medio') { min = 0; max = 12; }
-      else { min = 0; max = 15; }
+      else                             { min = 0; max = 15; }
     }
 
     let a = rand(min, max), b = rand(min, max);
@@ -373,10 +411,13 @@ document.addEventListener('DOMContentLoaded', () => {
     pbFill.style.width = pct + '%';
   }
 
-  function bloquearOpciones(){ opcionesEl.querySelectorAll('button').forEach(b=> b.disabled = true); }
+  function bloquearOpciones(){
+    opcionesEl.querySelectorAll('button').forEach(b=> b.disabled = true);
+  }
 
   function marcarCorrectaVisual(){
-    const correctoBtn = Array.from(opcionesEl.children).find(el => Number(el.getAttribute('data-val')) === respuestaCorrecta);
+    const correctoBtn = Array.from(opcionesEl.children)
+      .find(el => Number(el.getAttribute('data-val')) === respuestaCorrecta);
     if (correctoBtn) correctoBtn.classList.add('ok');
   }
 
@@ -439,7 +480,9 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('calc_rondas', String(rondasTotales));
     }catch{}
 
-    ronda = 0; aciertos = 0; totalTiempoAcumuladoMs = 0;
+    ronda = 0;
+    aciertos = 0;
+    totalTiempoAcumuladoMs = 0;
 
     btnComenzar.hidden = true;
     btnReiniciar.hidden = true;
@@ -461,7 +504,9 @@ document.addEventListener('DOMContentLoaded', () => {
     feedback.className = 'feedback muted';
     opcionesEl.innerHTML = '';
 
-    ronda = 0; aciertos = 0; totalTiempoAcumuladoMs = 0;
+    ronda = 0;
+    aciertos = 0;
+    totalTiempoAcumuladoMs = 0;
 
     actualizarUI();
     hideTimer();
@@ -491,46 +536,6 @@ document.addEventListener('DOMContentLoaded', () => {
   }catch{}
 
   // ======================================================
-  // TEMA (oscuro/claro)
-  // ======================================================
-  function applyTheme(mode){
-    const m = (mode === 'light' || mode === 'dark') ? mode : 'dark';
-    document.documentElement.setAttribute('data-theme', m);
-
-    const isDark = (m === 'dark');
-    themeBtn.setAttribute('aria-pressed', String(isDark));
-    themeBtn.setAttribute('aria-label', isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro');
-    themeBtn.setAttribute('title', isDark ? 'Cambiar a claro' : 'Cambiar a oscuro');
-
-    const metaTheme = document.querySelector('meta[name="theme-color"]');
-    if (metaTheme) metaTheme.setAttribute('content', m === 'dark' ? '#0b0b0b' : '#ffffff');
-  }
-
-  (function initTheme(){
-    let mode = 'dark';
-    try{
-      const stored = localStorage.getItem('theme');
-      if (stored === 'light' || stored === 'dark') { mode = stored; }
-      else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches) { mode = 'light'; }
-    }catch{}
-    applyTheme(mode);
-  })();
-
-  try {
-    if (!localStorage.getItem('theme') && window.matchMedia) {
-      const mq = window.matchMedia('(prefers-color-scheme: light)');
-      mq.addEventListener?.('change', (e) => applyTheme(e.matches ? 'light' : 'dark'));
-    }
-  } catch {}
-
-  themeBtn?.addEventListener('click', ()=>{
-    const current = document.documentElement.getAttribute('data-theme') || 'dark';
-    const next = current === 'dark' ? 'light' : 'dark';
-    try { localStorage.setItem('theme', next); } catch {}
-    applyTheme(next);
-  });
-
-  // ======================================================
   // MODAL DE AYUDA
   // ======================================================
   const aboutBtn   = document.getElementById('aboutBtn');
@@ -549,6 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
     aboutBtn?.setAttribute('aria-expanded', 'true');
     aboutClose?.focus();
   }
+
   function closeAbout(){
     if (!aboutModal) return;
     aboutModal.hidden = true;

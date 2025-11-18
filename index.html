@@ -64,29 +64,22 @@
   <div id="sr-updates" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
   <!-- Botones flotantes: Ayuda + Tema -->
-  <div class="fixed z-20 top-4 right-4 flex flex-col gap-2">
-    <button id="aboutBtn"
-            class="btn-ayuda w-10 h-10 rounded-full bg-white shadow-md border border-slate-200
-                   text-slate-900 text-lg font-bold hover:bg-lime-100 focus:outline-none
-                   focus:ring-2 focus:ring-lime-500 focus:ring-offset-2 focus:ring-offset-slate-100"
-            type="button"
-            aria-haspopup="dialog"
-            aria-controls="aboutModal"
-            aria-expanded="false"
-            aria-label="¿Por qué este juego?">
-      ?
-    </button>
+    <div class="fixed z-20 top-4 right-4 flex flex-col gap-2">
+      <button id="aboutBtn"
+              class="btn-ayuda w-10 h-10 rounded-full bg-white shadow-md border border-slate-200
+                    text-slate-900 text-lg font-bold hover:bg-lime-100 focus:outline-none
+                    focus:ring-2 focus:ring-lime-500 focus:ring-offset-2 focus:ring-offset-slate-100"
+              type="button"
+              aria-haspopup="dialog"
+              aria-controls="aboutModal"
+              aria-expanded="false"
+              aria-label="¿Por qué este juego?">
+        ?
+      </button>
+    </div>
 
-    <button id="themeToggle"
-            class="btn-theme w-10 h-10 rounded-full bg-white shadow-md border border-slate-200
-                   text-slate-900 text-sm hover:bg-slate-100 focus:outline-none
-                   focus:ring-2 focus:ring-lime-500 focus:ring-offset-2 focus:ring-offset-slate-100"
-            type="button"
-            aria-pressed="false"
-            aria-label="Cambiar tema"
-            title="Cambiar tema">
-    </button>
-  </div>
+
+    
 
   <!-- Modal ayuda (contenido y estructura iguales, sólo se mejora el interior con Tailwind) -->
   <div id="aboutModal"
