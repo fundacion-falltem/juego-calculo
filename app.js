@@ -29,9 +29,19 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const finalActions = document.getElementById('finalActions');
 
-  // Accesibilidad + pausa
   const srUpdates  = document.getElementById('sr-updates');
-  const btnPause   = document.getElementById('btnPause');
+  const btnPause   = document.getElementById('btnPause'); // si algún día lo activás
+
+  // Modal ayuda
+  const aboutBtn   = document.getElementById('aboutBtn');
+  const aboutModal = document.getElementById('aboutModal');
+  const aboutClose = document.getElementById('aboutClose');
+  const aboutCloseX= document.getElementById('aboutCloseX');
+
+  if (aboutModal) {
+    aboutModal.setAttribute('aria-hidden', 'true');
+    aboutModal.hidden = true;
+  }
 
   // ======================================================
   // ESTADO
@@ -39,14 +49,14 @@ document.addEventListener('DOMContentLoaded', () => {
   let operacion       = opSel?.value || 'suma';
   let dificultad      = difSel?.value || 'facil';
   let rondasTotales   = Number(ronSel?.value || 8);
-  let rondaActual     = 0;
+  let ronda           = 0;
   let aciertos        = 0;
   let respuestaCorrecta = null;
 
-  let timerId   = null;
-  let timeLeft  = 0;
-  let timeMax   = 0;
-  let paused    = false;
+  // timer
+  let timerId = null;
+  let timeLeft = 0, timeMax = 0;
+  let paused = false;
 
   // métrica simple
   let totalTiempoAcumuladoMs = 0;
@@ -154,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
     timerFill.dataset.level = level;
   }
 
-  // Pausa/Reanudar
+  // Pausa/Reanudar (si activás un botón de pausa)
   btnPause?.addEventListener('click', ()=>{
     if (!paused) {
       stopTimer();
@@ -178,16 +188,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'opcion-btn';
-      btn.dataset.valor = String(valor);
 
-      const strong = document.createElement('strong');
-      strong.textContent = letras[idx] + '.';
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = letras[idx] + '.';
 
       const span = document.createElement('span');
+      span.className = 'texto';
       span.textContent = String(valor);
 
-      btn.appendChild(strong);
+      btn.appendChild(tag);
       btn.appendChild(span);
+
+      btn.dataset.valor = String(valor);
 
       btn.addEventListener('click', ()=>{
         manejarRespuesta(Number(btn.dataset.valor));
@@ -233,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ======================================================
-  // FLUJO DE JUEGO (4 operaciones)
+  // FLUJO DE JUEGO
   // ======================================================
   function nuevaPregunta(){
     const op = operacion;
@@ -262,6 +275,11 @@ document.addEventListener('DOMContentLoaded', () => {
       const prod = a * b;
       respuestaCorrecta = a;
       setTxt(enunciado, `${prod} ÷ ${b} = ?`);
+    } else if (op === 'mixto'){
+      const isSuma = Math.random() < 0.5;
+      if (!isSuma && b > a) [a,b] = [b,a];
+      respuestaCorrecta = isSuma ? a + b : a - b;
+      setTxt(enunciado, `${a} ${isSuma ? '+' : '−'} ${b} = ?`);
     } else {
       // suma
       respuestaCorrecta = a + b;
@@ -271,30 +289,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const opciones = generarDistractores(respuestaCorrecta, min, max);
     renderOpciones(opciones);
 
-    rondaActual++;
-    actualizarProgreso();
+    ronda++;
+    actualizarUI();
 
     const baseMs = tiempoBasePorDificultad();
     startTimer(baseMs);
   }
 
-  function actualizarProgreso(){
-    setTxt(progTxt, `${rondaActual}/${rondasTotales}`);
-    setTxt(aciertosEl, aciertos);
-
-    const pct = Math.max(0, Math.min(100, Math.round((rondaActual / Math.max(1, rondasTotales)) * 100)));
-    pbFill.style.width = `${pct}%`;
+  function actualizarUI(){
+    setTxt(progTxt, `${Math.min(ronda, rondasTotales)}/${rondasTotales}`);
+    setTxt(aciertosEl, `Aciertos: ${aciertos}`);
+    const pct = Math.round((Math.min(ronda, rondasTotales)/rondasTotales) * 100);
+    pbFill.style.width = pct + '%';
   }
 
   function bloquearOpciones(){
-    const buttons = opcionesEl.querySelectorAll('.opcion-btn');
-    buttons.forEach(btn=>{
-      btn.setAttribute('aria-disabled','true');
-    });
+    opcionesEl.querySelectorAll('button').forEach(b=> b.disabled = true);
   }
 
   function marcarCorrectaYSeleccionada(valorSeleccionado){
-    const buttons = Array.from(opcionesEl.querySelectorAll('.opcion-btn'));
+    const buttons = Array.from(opcionesEl.querySelectorAll('button'));
     let correctaBtn = null;
     let seleccionadaBtn = null;
 
@@ -317,7 +331,6 @@ document.addEventListener('DOMContentLoaded', () => {
     stopTimer();
     bloquearOpciones();
 
-    const startTime = performance.now();
     const delay = 800;
 
     const correcta = (valorSeleccionado === respuestaCorrecta);
@@ -333,11 +346,11 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     marcarCorrectaYSeleccionada(valorSeleccionado);
-    actualizarProgreso();
+    actualizarUI();
 
     totalTiempoAcumuladoMs += delay;
     setTimeout(()=>{
-      if (rondaActual >= rondasTotales){
+      if (ronda >= rondasTotales){
         finalizarSesion();
       } else {
         nuevaPregunta();
@@ -355,7 +368,7 @@ document.addEventListener('DOMContentLoaded', () => {
     announce('Tiempo agotado');
 
     totalTiempoAcumuladoMs += tiempoBasePorDificultad();
-    if (rondaActual >= rondasTotales){
+    if (ronda >= rondasTotales){
       finalizarSesion();
     } else {
       setTimeout(()=> nuevaPregunta(), 800);
@@ -379,7 +392,6 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderFinalActions(pct){
     finalActions.innerHTML = '';
 
-    // Botón principal
     const btn = document.createElement('button');
     btn.className = 'btn principal';
 
@@ -398,7 +410,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     finalActions.appendChild(btn);
 
-    // Botón secundario: Elegir otro juego
     const linkOtroJuego = document.createElement('a');
     linkOtroJuego.href = 'https://falltem.org/juegos/#games-cards';
     linkOtroJuego.className = 'btn secundario';
@@ -407,7 +418,6 @@ document.addEventListener('DOMContentLoaded', () => {
     linkOtroJuego.rel = 'noopener noreferrer';
     finalActions.appendChild(linkOtroJuego);
 
-    // Link pequeño: Elegir otra configuración
     const linkConfig = document.createElement('a');
     linkConfig.href = '#';
     linkConfig.textContent = '⚙️ Elegir otra configuración';
@@ -435,30 +445,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTxt(enunciado, 'Sesión finalizada');
     setTxt(feedback, texto);
-    const baseClass = (pct >= 70)
+    feedback.className = (pct >= 70)
       ? 'feedback ok'
       : (pct >= 50 ? 'feedback muted' : 'feedback bad');
-    feedback.className = baseClass + ' is-final';
 
     renderFinalActions(pct);
 
     btnReiniciar.hidden = false;
     btnComenzar.hidden = true;
 
-    actualizarProgreso();
+    actualizarUI();
     hideTimer();
+    setTxt(timerText, '');
+    timerFill.style.width = '0%';
+    timerFill.dataset.level = 'normal';
 
     if (btnPause) btnPause.hidden = true;
     paused = false;
 
     if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
-
-    // tracking simple
-    trackFinDeJuego({
-      aciertos,
-      total: rondasTotales,
-      tiempoPromedio: tiempoPromedio
-    });
   }
 
   function cambiarDificultad(delta){
@@ -483,7 +488,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('calc_rondas', String(rondasTotales));
     }catch{}
 
-    rondaActual = 0;
+    ronda = 0;
     aciertos = 0;
     totalTiempoAcumuladoMs = 0;
 
@@ -496,7 +501,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     nuevaPregunta();
 
-    // Scroll suave hasta la sección de juego para mantener el foco visual
     const juegoSection = document.getElementById('juego');
     if (juegoSection){
       juegoSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -513,11 +517,11 @@ document.addEventListener('DOMContentLoaded', () => {
     feedback.className = 'feedback muted';
     opcionesEl.innerHTML = '';
 
-    rondaActual = 0;
+    ronda = 0;
     aciertos = 0;
     totalTiempoAcumuladoMs = 0;
 
-    actualizarProgreso();
+    actualizarUI();
     hideTimer();
 
     finalActions.hidden = true;
@@ -549,66 +553,52 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }catch{}
 
-  actualizarProgreso();
-  hideTimer();
-  setTxt(enunciado, 'Presioná “Comenzar” para iniciar.');
-  feedback.className = 'feedback muted';
-
   // ======================================================
   // MODAL AYUDA
   // ======================================================
-  function abrirModal(){
+  function openAbout(){
     if (!aboutModal) return;
-    aboutModal.removeAttribute('hidden');
-  }
-  function cerrarModal(){
-    if (!aboutModal) return;
-    aboutModal.setAttribute('hidden','true');
+    aboutModal.hidden = false;
+    aboutModal.setAttribute('aria-hidden', 'false');
+    aboutBtn?.setAttribute('aria-expanded', 'true');
+    aboutClose?.focus();
   }
 
-  const aboutBtn   = document.getElementById('aboutBtn');
-  const aboutModal = document.getElementById('aboutModal');
-  const aboutClose = document.getElementById('aboutClose');
-  const aboutCloseX= document.getElementById('aboutCloseX');
+  function closeAbout(){
+    if (!aboutModal) return;
+    aboutModal.hidden = true;
+    aboutModal.setAttribute('aria-hidden', 'true');
+    aboutBtn?.setAttribute('aria-expanded', 'false');
+  }
 
-  aboutBtn?.addEventListener('click', abrirModal);
-  aboutClose?.addEventListener('click', cerrarModal);
-  aboutCloseX?.addEventListener('click', cerrarModal);
+  aboutBtn?.addEventListener('click', openAbout);
+  aboutClose?.addEventListener('click', closeAbout);
+  aboutCloseX?.addEventListener('click', closeAbout);
 
   aboutModal?.addEventListener('click', (e)=>{
-    if (e.target === aboutModal) cerrarModal();
+    if (e.target === aboutModal) closeAbout();
   });
 
   document.addEventListener('keydown', (e)=>{
-    if (e.key === 'Escape' && !aboutModal?.hasAttribute('hidden')){
-      cerrarModal();
+    if (e.key === 'Escape' && aboutModal && !aboutModal.hidden){
+      closeAbout();
     }
   });
-});
 
-/* ======================================================
-   Tracking (Cloudflare / analíticas simples)
-   ====================================================== */
-function track(evento, data = {}){
-  if (!window.__cfBeacon) return;
-  try{
-    window.__cfBeacon.log(evento, data);
-  }catch(e){
-    // silencioso
+  // ======================================================
+  // SERVICE WORKER (PWA) – opcional
+  // ======================================================
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('./service-worker.js').catch(()=>{ /* noop */ });
+    });
   }
-}
 
-function trackFinDeJuego(stats) {
-  // stats puede contener: { aciertos, total, tiempoPromedio }
-  track("calculo_finalizado", stats);
-}
-
-/* Cuando el usuario cambia la operación */
-document.getElementById("operacion")?.addEventListener("change", (e) => {
-  track("calculo_cambio_operacion", { operacion: e.target.value });
-});
-
-/* Cuando cambia la dificultad */
-document.getElementById("dificultad")?.addEventListener("change", (e) => {
-  track("calculo_cambio_dificultad", { dificultad: e.target.value });
+  // ======================================================
+  // INIT
+  // ======================================================
+  actualizarUI();
+  hideTimer();
+  finalActions.hidden = true;
+  if (btnPause) btnPause.hidden = true;
 });
