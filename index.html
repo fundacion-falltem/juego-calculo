@@ -1,48 +1,30 @@
 <!doctype html>
 <html lang="es-AR">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <meta name="description" content="Cálculo amable para personas...cación y división con opciones grandes y tiempo por pregunta."/>
-  <meta name="theme-color" content="#0b0b0b"/>
-  <meta name="color-scheme" content="dark light"/>
-  <meta name="referrer" content="strict-origin-when-cross-origin"/>
-
-  <!-- CSP actualizada: permite Tailwind, Cloudflare y fuentes de Google -->
- <meta http-equiv="Content-Security-Policy"
-      content="
-        default-src 'self';
-        script-src 'self' https://cdn.tailwindcss.com https://static.cloudflareinsights.com;
-        connect-src 'self' https://cloudflareinsights.com https://*.cloudflareinsights.com;
-        style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-        font-src 'self' https://fonts.gstatic.com;
-        img-src 'self' data:;
-        object-src 'none';
-        base-uri 'none';
-        form-action 'none'
-      ">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Cálculo amable para personas mayores y público general. Practicá sumas, restas, multiplicación y división con opciones grandes y tiempo por pregunta." />
+  <meta name="theme-color" content="#f3f4f6" />
+  <meta name="color-scheme" content="light" />
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
 
   <title>Cálculo amable — Juegos Cognitivos FALLTEM</title>
 
-  <!-- PWA -->
-  <link rel="manifest" href="./manifest.webmanifest">
-  <link rel="icon" href="./images/icon-192.png" sizes="192x192">
-  <link rel="apple-touch-icon" href="./images/icon-192.png">
+  <!-- PWA (si ya usás manifest e íconos) -->
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <link rel="icon" href="./images/icon-192.png" sizes="192x192" />
+  <link rel="apple-touch-icon" href="./images/icon-192.png" />
 
-  <!-- Estilos originales del juego (modal, tema, etc.) -->
-  <link rel="stylesheet" href="./styles.css?v=1.9.1">
+  <!-- Estilos propios -->
+  <link rel="stylesheet" href="./styles.css?v=1.9.2" />
 
-  <!-- Fuente Montserrat, igual que Test orientativo -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <!-- Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet" />
 
-  <!-- Tailwind -->
+  <!-- Tailwind CDN (ok para este proyecto) -->
   <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Cloudflare Web Analytics (mismo token que Test orientativo) -->
-  <script defer src="https://static.cloudflareinsights.com/beacon.min.js"
-          data-cf-beacon='{"token": "819379439daf46ef9991624d0ccfcde2"}'></script>
 
   <style>
     body {
@@ -51,23 +33,23 @@
   </style>
 </head>
 <body class="min-h-screen bg-slate-100 text-slate-900">
-  <!-- Link para saltar directo al juego (accesible) -->
+  <!-- Link para lectores de pantalla -->
   <a href="#juego"
-     class="skip sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
+     class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
             focus:bg-lime-400 focus:text-slate-900 focus:px-3 focus:py-2
             focus:rounded-lg focus:shadow-lg">
     Saltar directamente al juego
   </a>
 
-  <!-- Región aria-live para lectores (no visible) -->
+  <!-- Región aria-live -->
   <div id="sr-updates" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
 
-  <!-- Botones flotantes: Ayuda -->
-  <div class="fixed z-20 top-4 right-4 flex flex-col gap-2">
+  <!-- Botón flotante de ayuda -->
+  <div class="fixed z-20 top-4 right-4">
     <button id="aboutBtn"
-            class="btn-ayuda w-10 h-10 rounded-full bg-white shadow-md border border-slate-200
-                  text-slate-900 text-lg font-bold hover:bg-lime-100 focus:outline-none
-                  focus:ring-2 focus:ring-lime-500 focus:ring-offset-2 focus:ring-offset-slate-100"
+            class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-200
+                   text-slate-900 text-lg font-bold hover:bg-lime-100 focus:outline-none
+                   focus:ring-2 focus:ring-lime-500 focus:ring-offset-2 focus:ring-offset-slate-100"
             type="button"
             aria-haspopup="dialog"
             aria-controls="aboutModal"
@@ -77,15 +59,15 @@
     </button>
   </div>
 
-  <!-- Modal de información / ayuda -->
+  <!-- Modal de ayuda -->
   <div id="aboutModal"
-       class="modal-backdrop hidden fixed inset-0 z-30 flex items-center justify-center px-4"
+       class="fixed inset-0 z-30 flex items-center justify-center px-4 bg-slate-900/60"
        role="dialog"
        aria-modal="true"
-       aria-labelledby="aboutTitle">
-    <div class="modal-overlay absolute inset-0 bg-slate-900/60"></div>
-
-    <div class="modal-content relative max-w-lg w-full bg-white rounded-2xl shadow-2xl p-6 sm:p-7">
+       aria-labelledby="aboutTitle"
+       aria-hidden="true"
+       hidden>
+    <div class="relative max-w-xl w-full bg-white rounded-2xl shadow-2xl p-6 sm:p-7">
       <header class="flex items-start justify-between mb-3">
         <h2 id="aboutTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">
           ¿Por qué este juego?
@@ -110,14 +92,14 @@
         <li>Respondé con <strong>botones grandes</strong> o usando las teclas <strong>A–D</strong>, <strong>1–4</strong> o <strong>Enter</strong>.</li>
       </ul>
 
-      <p class="muted aviso text-xs text-slate-500 mb-1">
+      <p class="text-xs text-slate-500 mb-1">
         <small>ℹ️ <strong>Actividad lúdica:</strong> no es práctica médica. No recolectamos datos personales.</small>
       </p>
-      <p class="muted aviso text-xs text-slate-500 mb-4">
+      <p class="text-xs text-slate-500 mb-4">
         <small id="versionLabel"></small>
       </p>
 
-      <div class="modal-actions mt-4 flex justify-end">
+      <div class="mt-4 flex justify-end">
         <button id="aboutClose"
                 class="btn principal inline-flex items-center justify-center rounded-full
                        bg-lime-500 hover:bg-lime-600 text-slate-900 font-bold
@@ -129,67 +111,64 @@
     </div>
   </div>
 
-  <!-- Layout principal tipo tarjeta centrada (como Test orientativo) -->
+  <!-- Contenedor principal -->
   <main class="min-h-screen flex items-center justify-center px-4 py-6 sm:py-8" role="main" aria-labelledby="titulo">
     <div class="w-full max-w-4xl bg-white shadow-2xl rounded-3xl px-6 py-8 sm:px-10 sm:py-10">
       <!-- Encabezado -->
-      <header class="mb-8 header">
+      <header class="mb-8">
         <p class="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-lime-600 mb-1">
-          JUEGOS COGNITIVOS FALLTEM
+          Juegos Cognitivos FALLTEM
         </p>
-        <h1 id="titulo" class="text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h1 id="titulo" class="text-3xl sm:text-4xl font-black leading-tight">
           Cálculo amable
         </h1>
-        <p class="mt-2 text-sm sm:text-base text-slate-700 max-w-2xl">
+        <p class="mt-3 text-base sm:text-lg text-slate-700 max-w-2xl">
           Practicá sumas, restas, multiplicación y división a tu ritmo. Seleccioná la respuesta correcta
           y disfrutá del progreso. Actividad lúdica, no médica.
         </p>
       </header>
 
-      <!-- Controles (operación, dificultad, rondas) -->
-      <section class="card card--controles mb-4" aria-label="Configuración del juego">
+      <!-- Controles -->
+      <section class="card mb-4" aria-label="Configuración del juego">
         <div class="controles">
           <!-- Operación -->
-          <div class="control control--operacion">
-            <label for="operacion" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <div class="control">
+            <label for="operacion" class="text-xs font-semibold uppercase tracking-wide text-slate-600">
               Operación
             </label>
             <select id="operacion"
-                    aria-label="Elegir tipo de operación"
                     class="mt-1 block w-full rounded-xl border border-slate-300 bg-white
                            py-2.5 px-3 text-base text-slate-900 shadow-sm focus:outline-none
                            focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-              <option value="suma">Suma</option>
+              <option value="suma" selected>Suma</option>
               <option value="resta">Resta</option>
-              <option value="mixto" selected>Mixto (suma y resta)</option>
-              <option value="multiplicacion">Multiplicación</option>
-              <option value="division">División</option>
+              <option value="mixto">Mixto (suma y resta)</option>
+              <option value="multi">Multiplicación</option>
+              <option value="divi">División</option>
             </select>
           </div>
 
           <!-- Dificultad -->
-          <div class="control control--dificultad">
-            <label for="dificultad" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <div class="control">
+            <label for="dificultad" class="text-xs font-semibold uppercase tracking-wide text-slate-600">
               Dificultad
             </label>
             <select id="dificultad"
-                    aria-label="Elegir dificultad"
                     class="mt-1 block w-full rounded-xl border border-slate-300 bg-white
                            py-2.5 px-3 text-base text-slate-900 shadow-sm focus:outline-none
                            focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
               <option value="facil" selected>Fácil (0–10)</option>
-              <option value="media">Media (0–20)</option>
-              <option value="dura">Desafiante (0–50)</option>
+              <option value="medio">Media (0–20)</option>
+              <option value="avanzado">Desafiante (0–50)</option>
             </select>
           </div>
 
           <!-- Rondas -->
-          <div class="control control--rondas">
-            <label for="rondas" class="block text-xs font-semibold uppercase tracking-wide text-slate-600">
+          <div class="control">
+            <label for="rondas" class="text-xs font-semibold uppercase tracking-wide text-slate-600">
               Rondas
             </label>
             <select id="rondas"
-                    aria-label="Elegir número de rondas"
                     class="mt-1 block w-full rounded-xl border border-slate-300 bg-white
                            py-2.5 px-3 text-base text-slate-900 shadow-sm focus:outline-none
                            focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
@@ -200,20 +179,19 @@
           </div>
 
           <!-- Botones -->
-          <div class="control buttons control--acciones flex flex-col justify-end mt-4 sm:mt-1">
+          <div class="control buttons flex flex-col justify-end mt-4 sm:mt-1">
             <button id="btnComenzar"
                     class="btn principal w-full inline-flex items-center justify-center rounded-full
                            bg-lime-500 hover:bg-lime-600 text-slate-900 font-extrabold
                            text-base sm:text-lg py-2.5 px-4 shadow-md transition"
-                    type="button"
-                    data-role="start">
+                    type="button">
               Comenzar
             </button>
 
             <button id="btnReiniciar"
                     class="btn secundario w-full inline-flex items-center justify-center rounded-full
-                           border border-slate-300 bg-white hover:bg-slate-50
-                           text-slate-700 font-semibold text-base py-2.5 px-4 transition"
+                           border border-slate-900 bg-slate-900 hover:bg-slate-800
+                           text-white font-semibold text-base py-2.5 px-4 transition"
                     type="button"
                     hidden>
               Volver a jugar
@@ -223,50 +201,47 @@
       </section>
 
       <!-- Juego -->
-      <section id="juego" class="card juego" aria-label="Juego de cálculo">
+      <section id="juego" class="card" aria-label="Juego de cálculo">
         <!-- Timer -->
-        <div class="timer-section" aria-hidden="false">
-          <p id="timerText" class="timer-text text-sm text-slate-800"></p>
-          <div class="timerBar bg-slate-200">
-            <div id="timerFill" class="h-full w-0 rounded-full"></div>
-          </div>
+        <p id="timerText" class="timer-text text-sm text-slate-800 mb-1"></p>
+        <div class="timerBar bg-slate-200 mb-4 rounded-full overflow-hidden">
+          <div id="timerFill" class="h-full w-0"></div>
         </div>
 
         <!-- Enunciado -->
         <h2 id="enunciado"
-            class="enunciado text-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900">
+            class="enunciado text-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
           Presioná “Comenzar” para iniciar.
         </h2>
 
         <!-- Opciones -->
-        <div id="opciones" class="opciones grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4" aria-label="Opciones de respuesta">
-          <!-- Botones de opciones se generan por JavaScript -->
+        <div id="opciones"
+             class="opciones grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2"
+             aria-label="Opciones de respuesta">
         </div>
 
         <!-- Feedback -->
         <p id="feedback" class="feedback muted text-sm text-slate-700 mt-3"></p>
 
-        <!-- Progreso -->
+        <!-- Progreso + aciertos (sin cero suelto) -->
         <div class="estado mt-4">
-          <div class="progreso flex items-center gap-3 mb-2">
-            <div class="flex-1 progresoBar bg-slate-200 rounded-full overflow-hidden">
-              <div id="pbFill" class="h-2 rounded-full"></div>
-            </div>
-            <p id="progTxt" class="text-xs font-semibold text-slate-600 whitespace-nowrap">
-              Progreso: 0/0
-            </p>
+          <div class="progresoBar bg-slate-200 rounded-full overflow-hidden mb-2">
+            <div id="pbFill" class="h-2 w-0 rounded-full"></div>
           </div>
-          <p id="aciertos" class="text-xs text-slate-600">
-            Aciertos: 0
+          <p class="text-xs text-slate-600 text-center">
+            Progreso:
+            <span id="progTxt">0/0</span>
+            · Aciertos:
+            <span id="aciertos">0</span>
           </p>
         </div>
 
-        <!-- Acciones finales (se rellenan al terminar la sesión) -->
-        <div id="finalActions" class="cta-buttons mt-4"></div>
+        <!-- Acciones finales, se llenan al terminar -->
+        <div id="finalActions" class="cta-buttons mt-4" hidden></div>
       </section>
 
-      <!-- Footer tipo Test orientativo -->
-      <footer class="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-500 mini-credit"
+      <!-- Footer -->
+      <footer class="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-500 text-center"
               role="contentinfo"
               aria-label="Créditos y aviso">
         <p>
@@ -282,7 +257,7 @@
     <p style="margin:1rem">Este juego necesita JavaScript para funcionar.</p>
   </noscript>
 
-  <!-- LÓGICA ORIGINAL DEL JUEGO: NO TOCAR -->
-  <script src="app.js?v=1.9.1" defer></script>
+  <!-- Lógica del juego -->
+  <script src="app.js?v=1.9.2" defer></script>
 </body>
 </html>

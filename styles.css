@@ -458,3 +458,9 @@ select:focus-visible{
   outline:3px solid var(--focus);
   outline-offset:3px;
 }
+
+
+/* Forzar que el modal se oculte cuando tiene el atributo hidden */
+#aboutModal[hidden] {
+  display: none !important;
+}
