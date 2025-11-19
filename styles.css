@@ -14,15 +14,18 @@
   --bg:#0b0b0b; --fg:#f5f5f5; --muted:#cfcfcf;
   --card:#171717; --border:#2a2a2a; --focus:#0ea5e9;
 
-  /* Marca */
-  --btn-primary-bg:#99cd68; --btn-primary-fg:#08340f; /* verde */
-  --btn-sec-bg:#5fcbe0;     --btn-sec-fg:#072a32;     /* celeste */
+  /* Botones flotantes */
+  --btn-sec-bg:#334155;
+  --btn-sec-fg:#e5f4ff;
 
-  --ok:#16a34a; --bad:#dc2626;
+  --btn-primary-bg:#99cd68; --btn-primary-fg:#062d0f;
+  --ok:#22c55e; --bad:#f97373;
 }
 
-[data-theme="light"]{
-  --bg:#f8fbf4; --fg:#1b1b1b; --muted:#374151;
+/* Tema claro (cuando se usa data-theme="light" o el body tailwind claro) */
+[data-theme="light"],
+body.bg-slate-100{
+  --bg:#f3f4f6; --fg:#0f172a; --muted:#6b7280;
   --card:#ffffff; --border:#e5e7eb; --focus:#5fcbe0;
 
   /* FABs con fondo oscuro y texto CLARO */
@@ -59,20 +62,18 @@ body{
 }
 
 /* ======================================================
-   Header
+   Utilitarios
    ====================================================== */
-.header{
-  margin-inline:auto;
-  max-width:860px;
-}
-.header h1{
-  font-size:clamp(2rem, 1.4vw + 1.6rem, 2.6rem);
-  margin:.4rem 0 0;
-  font-weight:900;
-  letter-spacing:.2px;
-}
-.intro{
-  margin:.5rem 0 var(--space);
+.visually-hidden{
+  position:absolute !important;
+  width:1px !important;
+  height:1px !important;
+  padding:0 !important;
+  margin:-1px !important;
+  overflow:hidden !important;
+  clip:rect(0,0,0,0) !important;
+  white-space:nowrap !important;
+  border:0 !important;
 }
 
 /* ======================================================
@@ -81,11 +82,16 @@ body{
 .card{
   background:var(--card);
   border:1px solid var(--border);
-  border-radius:14px;
-  padding:clamp(12px, 2.2vw, 20px);
-  margin:10px auto;
+  border-radius:16px;
+  padding:clamp(14px, 2vw, 22px);
+  margin:6px auto;
   max-width:860px;
-  box-shadow:0 2px 10px rgba(0,0,0,.06);
+  box-shadow:0 2px 10px rgba(15,23,42,.06);
+}
+
+/* Menos separación entre controles y juego */
+section.card + section.card.juego{
+  margin-top:8px;
 }
 
 /* ======================================================
@@ -117,19 +123,17 @@ select{
   padding:.85rem 1rem;
   width:100%;
   font-size:1.05rem;
-  background-image:url("data:image/svg+xml;utf8,<svg fill='currentColor' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5.5 7l4.5 5 4.5-5z'/></svg>");
+  background-image:url("data:image/svg+xml;utf8,<svg fill='currentColor' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5 7l5 5 5-5H5z'/></svg>");
   background-repeat:no-repeat;
-  background-position:right 1rem center;
-  background-size:1rem;
-  padding-right:2.4rem;
+  background-position:right .85rem center;
+  background-size:1rem 1rem;
 }
-
 select:focus-visible{
-  outline:3px solid var(--focus);
-  outline-offset:3px;
+  outline:2px solid var(--focus);
+  outline-offset:2px;
 }
 
-/* Botonera de controles */
+/* Botonera de controles – definición base */
 .control.buttons{
   display:block;
   grid-column:1 / -1;
@@ -165,7 +169,6 @@ select:focus-visible{
     box-shadow .15s ease,
     background-color .15s ease;
 }
-
 .btn:hover{
   filter:brightness(1.05);
   transform:translateY(-1px);
@@ -191,7 +194,7 @@ select:focus-visible{
 .control.buttons{
   display: flex;
   flex-direction: column;
-  gap: 0.75rem; /* ← separación entre botones */
+  gap: 1.5rem; /* separación más amplia entre "Comenzar" y "Volver a jugar" */
 }
 
 /* ======================================================
@@ -213,22 +216,23 @@ select:focus-visible{
 
 /* Timer */
 .timer-text{
-  margin:.35rem 0 .25rem;
-  font-weight:800;
-  opacity:.95;
+  margin:.35rem 0 .35rem;
+  font-weight:900;
+  letter-spacing:.01em;
+  opacity:.98;
 }
 .timerBar{
-  height:8px;
-  background:color-mix(in oklab, var(--border) 80%, transparent);
+  height:12px;
+  background:color-mix(in oklab, var(--border) 75%, transparent);
   border-radius:999px;
   overflow:hidden;
-  margin-bottom:.6rem;
+  margin-bottom:1rem;
 }
 #timerFill{
   height:100%;
   width:0%;
   background:var(--btn-sec-bg);
-  transition:width .10s linear, background-color .15s ease;
+  transition:width .10s linear
 }
 #timerFill[data-level="warn"]{
   background:#f59e0b;
@@ -260,16 +264,15 @@ select:focus-visible{
   margin:.4rem 0 1.1rem;
 }
 
-/* Opciones de respuesta */
+/* Opciones */
 .opciones{
   display:grid;
   grid-template-columns:1fr;
-  gap:1rem;
-  margin-top:.6rem;
+  gap:.8rem;
 }
-@media (min-width:700px){
+@media (min-width:640px){
   .opciones{
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:repeat(2, minmax(0,1fr));
   }
 }
 
@@ -294,17 +297,28 @@ select:focus-visible{
     box-shadow .15s ease,
     background-color .15s ease;
 }
-
-.opcion-btn strong{
-  margin-right:.4rem;
-}
-
 .opcion-btn:hover{
-  filter:brightness(1.06);
+  filter:brightness(1.03);
   transform:translateY(-1px);
 }
-.opcion-btn:active{
-  transform:translateY(0);
+.opcion-btn span.tag{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:2.2rem;
+  height:2.2rem;
+  border-radius:999px;
+  background:rgba(15,23,42,.9);
+  color:#fff;
+  font-weight:900;
+  font-size:.95rem;
+}
+.opcion-btn span.texto{
+  flex:1;
+}
+.opcion-btn[aria-disabled="true"]{
+  cursor:default;
+  opacity:.85;
 }
 .opcion-btn:focus-visible{
   outline:none;
@@ -329,10 +343,19 @@ select:focus-visible{
 
 /* Feedback + estado */
 .feedback{
-  margin-top:.6rem;
+  margin-top:.8rem;
   text-align:center;
   min-height:1.4em;
 }
+
+.feedback.is-final{
+  font-size:1.02rem;
+  font-weight:700;
+  padding:.6rem .8rem;
+  border-radius:999px;
+  background:rgba(153,205,104,.12);
+}
+
 .feedback.muted{
   color:var(--muted);
 }
@@ -358,112 +381,6 @@ select:focus-visible{
   min-width:220px;
   padding:1rem 1.4rem;
   font-size:1.05rem;
-  border-radius:14px;
-  font-weight:900;
-  text-align:center;
-  box-shadow:0 2px 6px rgba(0,0,0,.08);
-  transition:transform .08s ease, filter .15s ease, box-shadow .15s ease;
-}
-#finalActions .btn.secundario:hover{
-  filter:brightness(1.05);
-  transform:translateY(-1px);
-}
-#finalActions a[href^="#"]{
-  color:var(--muted);
-  text-decoration:none;
-  font-weight:700;
-}
-
-/* ======================================================
-   FABs (ayuda + tema) arriba derecha
-   ====================================================== */
-.fixed-top-right{
-  position:fixed;
-  top:calc(12px + env(safe-area-inset-top, 0px));
-  right:calc(12px + env(safe-area-inset-right, 0px));
-  z-index:10;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-}
-
-/* Botón ayuda (?) */
-.btn-ayuda{
-  width:56px;
-  height:56px;
-  border-radius:50%;
-  border:0;
-  cursor:pointer;
-  background:var(--btn-sec-bg);
-  color:var(--btn-sec-fg);
-  font-weight:900;
-  font-size:1.4rem;
-  line-height:1;
-  box-shadow:0 4px 14px rgba(0,0,0,.25);
-}
-.btn-ayuda:focus-visible{
-  outline:3px solid var(--focus);
-  outline-offset:2px;
-}
-
-/* Botón tema */
-.btn-theme{
-  width:56px;
-  height:56px;
-  border-radius:50%;
-  border:0;
-  cursor:pointer;
-  line-height:1;
-  display:inline-flex;
-  align-items:center;
-  justify-content:center;
-  background:var(--btn-sec-bg);
-  color:var(--btn-sec-fg);
-  box-shadow:0 4px 14px rgba(0,0,0,.25);
-  font-size:0;
-}
-.btn-theme:focus-visible{
-  outline:3px solid var(--focus);
-  outline-offset:2px;
-}
-[data-theme="light"] .btn-theme::before{
-  content:"🌙";
-  font-size:1.45rem;
-  filter:drop-shadow(0 0 1px rgba(0,0,0,.35));
-}
-[data-theme="dark"] .btn-theme::before{
-  content:"☀️";
-  font-size:1.45rem;
-  filter:drop-shadow(0 0 1px rgba(0,0,0,.35));
-}
-
-/* ======================================================
-   Modal de ayuda
-   ====================================================== */
-.modal[hidden]{ display:none !important; }
-.modal{
-  position:fixed;
-  inset:0;
-  display:flex;
-  align-items:flex-start;
-  justify-content:center;
-  padding:min(5vh,48px) 16px;
-  background:rgba(0,0,0,.55);
-  z-index:1000;
-}
-.modal-card{
-  width:min(820px, 100%);
-  background:var(--card);
-  color:var(--fg);
-  border:1px solid var(--border);
-  border-radius:12px;
-  box-shadow:0 12px 30px rgba(0,0,0,.35);
-  padding:var(--space);
-}
-.modal-actions{
-  display:flex;
-  gap:10px;
-  justify-content:flex-end;
 }
 
 /* ======================================================
@@ -483,13 +400,6 @@ select:focus-visible{
   align-items:center;
   text-align:center;
 }
-.mini-credit .mini-label{
-  text-transform:uppercase;
-  letter-spacing:.08em;
-  font-weight:800;
-  font-size:.9em;
-  margin-right:.2em;
-}
 
 /* ======================================================
    Accesibilidad
@@ -498,50 +408,43 @@ select:focus-visible{
   position:absolute;
   left:-9999px;
   top:auto;
-}
-.skip:focus{
-  left:12px;
-  top:12px;
-  background:var(--btn-primary-bg);
-  color:var(--btn-primary-fg);
-  padding:8px 10px;
-  border-radius:8px;
-  z-index:1000;
-}
-
-.visually-hidden{
-  position:absolute !important;
   width:1px;
   height:1px;
-  margin:-1px;
-  padding:0;
   overflow:hidden;
-  clip:rect(0 0 0 0);
-  border:0;
 }
 
-/* Tamaño muy grande (modo accesible extra) */
-html.muy-grande{
-  font-size:125%;
+.skip:focus{
+  left:0;
+  top:0;
+  width:auto;
+  height:auto;
+  background:#fff;
+  padding:.5rem .75rem;
+  z-index:999;
 }
-html.muy-grande body{
-  --fs-base:clamp(20px, 1.3vw + 16px, 24px);
+
+/* Modal */
+.modal-backdrop.hidden{
+  display:none;
+}
+.modal-content{
+  max-height:min(640px, 90vh);
+  overflow:auto;
 }
 
 /* ======================================================
-   Ajustes pequeños extra
+   Responsive
    ====================================================== */
-
-/* En pantallas muy chicas, que todo respire un poco mejor */
-@media (max-width:480px){
-  .card{
-    margin-inline:auto;
+@media (max-width:640px){
+  body{
+    font-size:clamp(16px, 4vw, 18px);
   }
-  .header h1{
-    text-align:left;
+  .enunciado{
+    font-size:1.75rem;
   }
-  .control.buttons .btn{
-    font-size:1.02rem;
+  .opcion-btn{
+    font-size:1rem;
+    padding:.85rem 1rem;
   }
 }
 

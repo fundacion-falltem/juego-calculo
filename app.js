@@ -36,15 +36,17 @@ document.addEventListener('DOMContentLoaded', () => {
   // ======================================================
   // ESTADO
   // ======================================================
-  let rondasTotales = 8, ronda = 0, aciertos = 0;
-  let operacion = 'suma';
-  let dificultad = 'facil';
+  let operacion       = opSel?.value || 'suma';
+  let dificultad      = difSel?.value || 'facil';
+  let rondasTotales   = Number(ronSel?.value || 8);
+  let rondaActual     = 0;
+  let aciertos        = 0;
   let respuestaCorrecta = null;
 
-  // timer
-  let timerId = null;
-  let timeLeft = 0, timeMax = 0;
-  let paused = false;
+  let timerId   = null;
+  let timeLeft  = 0;
+  let timeMax   = 0;
+  let paused    = false;
 
   // métrica simple
   let totalTiempoAcumuladoMs = 0;
@@ -83,36 +85,21 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const n of candidatos){
       if (Number.isInteger(n) && n>=min && n<=max && !set.has(n)){
         set.add(n); result.push(n);
+        if (result.length >= 3) break;
       }
-      if (result.length >= 6) break;
     }
-    return result;
+    while (result.length < 3){
+      const n = rand(min, max);
+      if (!set.has(n)){
+        set.add(n); result.push(n);
+      }
+    }
+    return barajar([correcta, ...result]);
   }
 
   // ======================================================
   // TIMER
   // ======================================================
-  function showTimer(){
-    timerText.style.display = '';
-    timerText.setAttribute('aria-hidden','false');
-    timerBar.style.display  = '';
-    timerBar.setAttribute('aria-hidden','false');
-  }
-
-  function hideTimer(){
-    timerText.style.display = 'none';
-    timerText.setAttribute('aria-hidden','true');
-    timerBar.style.display  = 'none';
-    timerBar.setAttribute('aria-hidden','true');
-  }
-
-  function stopTimer(){
-    if (timerId){
-      clearInterval(timerId);
-      timerId = null;
-    }
-  }
-
   function startTimer(ms){
     stopTimer();
     timeMax = ms;
@@ -129,11 +116,28 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTimerUI();
       }
     }, 100);
+    timerBar?.classList.remove('hidden');
+  }
+
+  function stopTimer(){
+    if (timerId !== null){
+      clearInterval(timerId);
+      timerId = null;
+    }
+  }
+
+  function hideTimer(){
+    if (timerBar){
+      timerBar.classList.add('hidden');
+    }
+    setTxt(timerText, '');
+    timerFill.style.width = '0%';
+    timerFill.dataset.level = 'normal';
   }
 
   function updateTimerUI(){
     const s = Math.ceil(timeLeft / 1000);
-    setTxt(timerText, s > 0 ? `Tiempo: ${s} s` : 'Tiempo: 0 s');
+    setTxt(timerText, s > 0 ? `⏱ Tiempo: ${s} s` : '⏱ Tiempo: 0 s');
 
     const alerta = timeLeft <= 3000 && timeLeft > 0;
     timerText.classList.toggle('timer-alert', alerta);
@@ -164,18 +168,35 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ======================================================
-  // OPCIONES
+  // RENDER OPCIONES + TECLADO
   // ======================================================
-  function limpiarEstadosOpciones(){
-    opcionesEl.querySelectorAll('button').forEach(b=>{
-      b.classList.remove('is-selected','ok','bad','marcada');
-      b.disabled = false;
-    });
-  }
+  function renderOpciones(opciones){
+    opcionesEl.innerHTML = '';
+    const letras = ['A','B','C','D'];
 
-  function marcarSeleccion(b){
-    opcionesEl.querySelectorAll('button').forEach(x=>x.classList.remove('is-selected'));
-    b.classList.add('is-selected');
+    opciones.forEach((valor, idx)=>{
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'opcion-btn';
+      btn.dataset.valor = String(valor);
+
+      const strong = document.createElement('strong');
+      strong.textContent = letras[idx] + '.';
+
+      const span = document.createElement('span');
+      span.textContent = String(valor);
+
+      btn.appendChild(strong);
+      btn.appendChild(span);
+
+      btn.addEventListener('click', ()=>{
+        manejarRespuesta(Number(btn.dataset.valor));
+      });
+
+      opcionesEl.appendChild(btn);
+    });
+
+    attachKeyHandler();
   }
 
   function attachKeyHandler(){
@@ -189,7 +210,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const up = ['ArrowUp','ArrowLeft'].includes(key);
       const down = ['ArrowDown','ArrowRight'].includes(key);
 
-      // Letras A–D
+      // Letra A–D
       const kU = key.toUpperCase();
       const letterIdx = letters.indexOf(kU);
       if (letterIdx >= 0 && buttons[letterIdx]) { buttons[letterIdx].click(); return; }
@@ -205,35 +226,144 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Activación
       if (key === 'Enter' || key === ' ') {
-        (opcionesEl.querySelector('.is-selected') || buttons[0])?.click();
-        return;
+        current?.click();
       }
     };
     document.addEventListener('keydown', keyHandlerRef);
   }
 
-  function renderOpciones(lista){
-    const letras = ['A','B','C','D'];
-    opcionesEl.innerHTML = '';
-    lista.forEach((val, i)=>{
-      const b = document.createElement('button');
-      b.className = 'opcion-btn';
-      b.setAttribute('data-val', String(val));
-      b.setAttribute('aria-label', `Opción ${letras[i]}: ${val}`);
-      b.innerHTML = `<strong>${letras[i]}.</strong> ${val}`;
-      b.addEventListener('pointerdown', ()=> marcarSeleccion(b));
-      b.addEventListener('focus',      ()=> marcarSeleccion(b));
-      b.addEventListener('mouseenter', ()=> marcarSeleccion(b));
-      b.addEventListener('blur',       ()=> b.classList.remove('is-selected'));
-      b.addEventListener('click', ()=> elegir(val, b));
-      opcionesEl.appendChild(b);
+  // ======================================================
+  // FLUJO DE JUEGO (4 operaciones)
+  // ======================================================
+  function nuevaPregunta(){
+    const op = operacion;
+
+    // rangos base (suma/resta)
+    let [min, max] = rangoPorDificultad();
+
+    // ajustar rangos para multiplicación/división (tablas)
+    if (op === 'multi' || op === 'divi'){
+      if (dificultad === 'facil')      { min = 0; max = 10; }
+      else if (dificultad === 'medio') { min = 0; max = 12; }
+      else                             { min = 0; max = 15; }
+    }
+
+    let a = rand(min, max), b = rand(min, max);
+
+    if (op === 'resta'){
+      if (b > a) [a,b] = [b,a];
+      respuestaCorrecta = a - b;
+      setTxt(enunciado, `${a} − ${b} = ?`);
+    } else if (op === 'multi'){
+      respuestaCorrecta = a * b;
+      setTxt(enunciado, `${a} × ${b} = ?`);
+    } else if (op === 'divi'){
+      b = b || 1;
+      const prod = a * b;
+      respuestaCorrecta = a;
+      setTxt(enunciado, `${prod} ÷ ${b} = ?`);
+    } else {
+      // suma
+      respuestaCorrecta = a + b;
+      setTxt(enunciado, `${a} + ${b} = ?`);
+    }
+
+    const opciones = generarDistractores(respuestaCorrecta, min, max);
+    renderOpciones(opciones);
+
+    rondaActual++;
+    actualizarProgreso();
+
+    const baseMs = tiempoBasePorDificultad();
+    startTimer(baseMs);
+  }
+
+  function actualizarProgreso(){
+    setTxt(progTxt, `${rondaActual}/${rondasTotales}`);
+    setTxt(aciertosEl, aciertos);
+
+    const pct = Math.max(0, Math.min(100, Math.round((rondaActual / Math.max(1, rondasTotales)) * 100)));
+    pbFill.style.width = `${pct}%`;
+  }
+
+  function bloquearOpciones(){
+    const buttons = opcionesEl.querySelectorAll('.opcion-btn');
+    buttons.forEach(btn=>{
+      btn.setAttribute('aria-disabled','true');
     });
-    attachKeyHandler();
-    opcionesEl.querySelector('button')?.focus();
+  }
+
+  function marcarCorrectaYSeleccionada(valorSeleccionado){
+    const buttons = Array.from(opcionesEl.querySelectorAll('.opcion-btn'));
+    let correctaBtn = null;
+    let seleccionadaBtn = null;
+
+    buttons.forEach(btn=>{
+      const valor = Number(btn.dataset.valor);
+      if (valor === respuestaCorrecta) correctaBtn = btn;
+      if (valor === valorSeleccionado) seleccionadaBtn = btn;
+    });
+
+    if (correctaBtn) correctaBtn.classList.add('ok');
+    if (seleccionadaBtn && seleccionadaBtn !== correctaBtn){
+      seleccionadaBtn.classList.add('bad','is-selected');
+    } else if (seleccionadaBtn){
+      seleccionadaBtn.classList.add('is-selected');
+    }
+  }
+
+  function manejarRespuesta(valorSeleccionado){
+    if (respuestaCorrecta == null) return;
+    stopTimer();
+    bloquearOpciones();
+
+    const startTime = performance.now();
+    const delay = 800;
+
+    const correcta = (valorSeleccionado === respuestaCorrecta);
+    if (correcta){
+      aciertos++;
+      setTxt(feedback, '¡Bien! Respuesta correcta.');
+      feedback.className = 'feedback ok';
+      announce('Respuesta correcta');
+    } else {
+      setTxt(feedback, `La respuesta correcta era ${respuestaCorrecta}.`);
+      feedback.className = 'feedback bad';
+      announce('Respuesta incorrecta');
+    }
+
+    marcarCorrectaYSeleccionada(valorSeleccionado);
+    actualizarProgreso();
+
+    totalTiempoAcumuladoMs += delay;
+    setTimeout(()=>{
+      if (rondaActual >= rondasTotales){
+        finalizarSesion();
+      } else {
+        nuevaPregunta();
+      }
+    }, delay);
+  }
+
+  function tiempoAgotado(){
+    if (respuestaCorrecta == null) return;
+    bloquearOpciones();
+    marcarCorrectaYSeleccionada(undefined);
+
+    setTxt(feedback, 'Se acabó el tiempo.');
+    feedback.className = 'feedback bad';
+    announce('Tiempo agotado');
+
+    totalTiempoAcumuladoMs += tiempoBasePorDificultad();
+    if (rondaActual >= rondasTotales){
+      finalizarSesion();
+    } else {
+      setTimeout(()=> nuevaPregunta(), 800);
+    }
   }
 
   // ======================================================
-  // FEEDBACK + CIERRE
+  // CIERRE DE SESIÓN
   // ======================================================
   function cierreDeSesion({ aciertos, rondas, tiempoPromedioMs = null }){
     const pct = Math.round((aciertos / Math.max(1, rondas)) * 100);
@@ -288,7 +418,6 @@ document.addEventListener('DOMContentLoaded', () => {
     finalActions.appendChild(linkConfig);
 
     finalActions.hidden = false;
-    btn.focus();
   }
 
   function finalizarSesion(){
@@ -306,25 +435,30 @@ document.addEventListener('DOMContentLoaded', () => {
 
     setTxt(enunciado, 'Sesión finalizada');
     setTxt(feedback, texto);
-    feedback.className = (pct >= 70)
+    const baseClass = (pct >= 70)
       ? 'feedback ok'
       : (pct >= 50 ? 'feedback muted' : 'feedback bad');
+    feedback.className = baseClass + ' is-final';
 
     renderFinalActions(pct);
 
     btnReiniciar.hidden = false;
     btnComenzar.hidden = true;
 
-    actualizarUI();
+    actualizarProgreso();
     hideTimer();
-    setTxt(timerText, '');
-    timerFill.style.width = '0%';
-    timerFill.dataset.level = 'normal';
 
     if (btnPause) btnPause.hidden = true;
     paused = false;
 
     if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
+
+    // tracking simple
+    trackFinDeJuego({
+      aciertos,
+      total: rondasTotales,
+      tiempoPromedio: tiempoPromedio
+    });
   }
 
   function cambiarDificultad(delta){
@@ -336,138 +470,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // ======================================================
-  // FLUJO DE JUEGO (4 operaciones)
-  // ======================================================
-  function nuevaPregunta(){
-    const op = operacion;
-
-    // rangos base (suma/resta)
-    let [min, max] = rangoPorDificultad();
-
-    // ajustar rangos para multiplicación/división (tablas)
-    if (op === 'multi' || op === 'divi'){
-      if (dificultad === 'facil')      { min = 0; max = 10; }
-      else if (dificultad === 'medio') { min = 0; max = 12; }
-      else                             { min = 0; max = 15; }
-    }
-
-    let a = rand(min, max), b = rand(min, max);
-
-    if (op === 'resta'){
-      if (b > a) [a,b] = [b,a];
-      respuestaCorrecta = a - b;
-      setTxt(enunciado, `${a} − ${b} = ?`);
-    } else if (op === 'multi'){
-      respuestaCorrecta = a * b;
-      setTxt(enunciado, `${a} × ${b} = ?`);
-    } else if (op === 'divi'){
-      b = Math.max(1, b);
-      const prod = a * b;
-      respuestaCorrecta = a;
-      setTxt(enunciado, `${prod} ÷ ${b} = ?`);
-    } else {
-      respuestaCorrecta = a + b;
-      setTxt(enunciado, `${a} + ${b} = ?`);
-    }
-
-    // rango de distractores según operación
-    const resMin = 0;
-    const resMax = (op === 'multi') ? (max * max)
-                  : (op === 'divi') ? max
-                  : (op === 'resta') ? max
-                  : (max + max);
-
-    const distractores = generarDistractores(respuestaCorrecta, resMin, resMax).slice(0, 6);
-    const opciones = barajar([respuestaCorrecta, ...barajar(distractores).slice(0,3)]);
-
-    limpiarEstadosOpciones();
-    renderOpciones(opciones);
-
-    setTxt(feedback, '');
-    feedback.className = 'feedback muted';
-    finalActions.hidden = true;
-
-    actualizarUI();
-    showTimer();
-
-    const base = tiempoBasePorDificultad();
-    const extraOp = (op === 'multi' || op === 'divi') ? 2000 : 0;
-    startTimer(base + extraOp);
-
-    // Mostrar pausa (si existe el botón)
-    if (btnPause) {
-      btnPause.hidden = false;
-      btnPause.textContent = 'Pausar';
-    }
-    paused = false;
-
-    announce(`Nueva pregunta. ${enunciado.textContent}`);
-  }
-
-  function actualizarUI(){
-    setTxt(progTxt, `${Math.min(ronda, rondasTotales)}/${rondasTotales}`);
-    setTxt(aciertosEl, aciertos);
-    const pct = Math.round((Math.min(ronda, rondasTotales)/rondasTotales) * 100);
-    pbFill.style.width = pct + '%';
-  }
-
-  function bloquearOpciones(){
-    opcionesEl.querySelectorAll('button').forEach(b=> b.disabled = true);
-  }
-
-  function marcarCorrectaVisual(){
-    const correctoBtn = Array.from(opcionesEl.children)
-      .find(el => Number(el.getAttribute('data-val')) === respuestaCorrecta);
-    if (correctoBtn) correctoBtn.classList.add('ok');
-  }
-
-  function elegir(valor, btn){
-    stopTimer();
-    totalTiempoAcumuladoMs += Math.min(timeMax, Math.max(0, timeMax - timeLeft));
-
-    const ok = (valor === respuestaCorrecta);
-    bloquearOpciones();
-    btn.classList.add('marcada', ok ? 'ok' : 'bad');
-    if (!ok) marcarCorrectaVisual();
-
-    if (ok){
-      aciertos++;
-      setTxt(feedback, '✔ ¡Correcto!');
-      feedback.className = 'feedback ok';
-      announce(`Correcto. Respuesta ${valor}. Progreso ${ronda+1}/${rondasTotales}.`);
-    } else {
-      setTxt(feedback, `✘ Casi. Respuesta correcta: ${respuestaCorrecta}.`);
-      feedback.className = 'feedback bad';
-      announce(`Incorrecto. La correcta era ${respuestaCorrecta}. Progreso ${ronda+1}/${rondasTotales}.`);
-    }
-
-    ronda++;
-    if (ronda >= rondasTotales){
-      finalizarSesion();
-    } else {
-      setTimeout(nuevaPregunta, 700);
-    }
-  }
-
-  function tiempoAgotado(){
-    bloquearOpciones();
-    marcarCorrectaVisual();
-    setTxt(feedback, `⏰ Tiempo agotado. La respuesta correcta era: ${respuestaCorrecta}.`);
-    feedback.className = 'feedback bad';
-    totalTiempoAcumuladoMs += timeMax;
-
-    announce(`Tiempo agotado. La respuesta correcta era ${respuestaCorrecta}. Progreso ${ronda+1}/${rondasTotales}.`);
-
-    ronda++;
-    if (ronda >= rondasTotales){
-      finalizarSesion();
-    } else {
-      setTimeout(nuevaPregunta, 800);
-    }
-  }
-
-  // ======================================================
-  // EVENTOS
+  // EVENTOS PRINCIPALES
   // ======================================================
   btnComenzar.addEventListener('click', ()=>{
     operacion = opSel.value;
@@ -480,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('calc_rondas', String(rondasTotales));
     }catch{}
 
-    ronda = 0;
+    rondaActual = 0;
     aciertos = 0;
     totalTiempoAcumuladoMs = 0;
 
@@ -492,6 +495,12 @@ document.addEventListener('DOMContentLoaded', () => {
     timerFill.dataset.level = 'normal';
 
     nuevaPregunta();
+
+    // Scroll suave hasta la sección de juego para mantener el foco visual
+    const juegoSection = document.getElementById('juego');
+    if (juegoSection){
+      juegoSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   });
 
   btnReiniciar.addEventListener('click', ()=>{
@@ -504,16 +513,12 @@ document.addEventListener('DOMContentLoaded', () => {
     feedback.className = 'feedback muted';
     opcionesEl.innerHTML = '';
 
-    ronda = 0;
+    rondaActual = 0;
     aciertos = 0;
     totalTiempoAcumuladoMs = 0;
 
-    actualizarUI();
+    actualizarProgreso();
     hideTimer();
-    setTxt(timerText, '');
-
-    timerFill.style.width = '0%';
-    timerFill.dataset.level = 'normal';
 
     finalActions.hidden = true;
 
@@ -523,127 +528,76 @@ document.addEventListener('DOMContentLoaded', () => {
     if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
   });
 
-  // Restaurar prefs
+  // ======================================================
+  // ESTADO INICIAL
+  // ======================================================
   try{
-    const op = localStorage.getItem('calc_op');
-    if (op && ['suma','resta','multi','divi'].includes(op)) opSel.value = op;
-
-    const df = localStorage.getItem('calc_diff');
-    if (df && ['facil','medio','avanzado'].includes(df)) difSel.value = df;
-
-    const rs = localStorage.getItem('calc_rondas');
-    if (rs && ['6','8','10'].includes(rs)) ronSel.value = rs;
+    const opLS   = localStorage.getItem('calc_op');
+    const diffLS = localStorage.getItem('calc_diff');
+    const ronLS  = localStorage.getItem('calc_rondas');
+    if (opLS && opSel.querySelector(`option[value="${opLS}"]`)){
+      opSel.value = opLS;
+      operacion = opLS;
+    }
+    if (diffLS && difSel.querySelector(`option[value="${diffLS}"]`)){
+      difSel.value = diffLS;
+      dificultad = diffLS;
+    }
+    if (ronLS && ronSel.querySelector(`option[value="${ronLS}"]`)){
+      ronSel.value = ronLS;
+      rondasTotales = Number(ronLS);
+    }
   }catch{}
 
+  actualizarProgreso();
+  hideTimer();
+  setTxt(enunciado, 'Presioná “Comenzar” para iniciar.');
+  feedback.className = 'feedback muted';
+
   // ======================================================
-  // MODAL DE AYUDA
+  // MODAL AYUDA
   // ======================================================
+  function abrirModal(){
+    if (!aboutModal) return;
+    aboutModal.removeAttribute('hidden');
+  }
+  function cerrarModal(){
+    if (!aboutModal) return;
+    aboutModal.setAttribute('hidden','true');
+  }
+
   const aboutBtn   = document.getElementById('aboutBtn');
   const aboutModal = document.getElementById('aboutModal');
   const aboutClose = document.getElementById('aboutClose');
+  const aboutCloseX= document.getElementById('aboutCloseX');
 
-  if (aboutModal) {
-    aboutModal.setAttribute('aria-hidden', 'true');
-    aboutModal.hidden = true;
-  }
+  aboutBtn?.addEventListener('click', abrirModal);
+  aboutClose?.addEventListener('click', cerrarModal);
+  aboutCloseX?.addEventListener('click', cerrarModal);
 
-  function openAbout(){
-    if (!aboutModal) return;
-    aboutModal.hidden = false;
-    aboutModal.setAttribute('aria-hidden', 'false');
-    aboutBtn?.setAttribute('aria-expanded', 'true');
-    aboutClose?.focus();
-  }
+  aboutModal?.addEventListener('click', (e)=>{
+    if (e.target === aboutModal) cerrarModal();
+  });
 
-  function closeAbout(){
-    if (!aboutModal) return;
-    aboutModal.hidden = true;
-    aboutModal.setAttribute('aria-hidden', 'true');
-    aboutBtn?.setAttribute('aria-expanded', 'false');
-  }
-
-  aboutBtn?.addEventListener('click', openAbout);
-  aboutClose?.addEventListener('click', closeAbout);
-  aboutModal?.addEventListener('click', (e)=>{ if (e.target === aboutModal) closeAbout(); });
-  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeAbout(); });
-
-  // ======================================================
-  // SW (PWA)
-  // ======================================================
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', () => {
-      navigator.serviceWorker.register('./service-worker.js').catch(()=>{ /* noop */ });
-    });
-  }
-
-  // ======================================================
-  // INIT
-  // ======================================================
-  actualizarUI();
-  hideTimer();
-  finalActions.hidden = true;
-  if (btnPause) btnPause.hidden = true;
-});
-
-/* ============================================================
-   CLOUD flare — Eventos personalizados para "Cálculo amable"
-   ============================================================ */
-
-/**
- * Envía un evento personalizado a Cloudflare Web Analytics
- * usando navigator.sendBeacon() para no bloquear la UI.
- *
- * @param {string} eventName — nombre del evento (string)
- * @param {object} data — info extra opcional
- */
-function track(eventName, data = {}) {
-  try {
-    const payload = {
-      event: eventName,
-      timestamp: Date.now(),
-      ...data,
-      // Token del sitio (el mismo que ya usás)
-      token: "96e0f7e2211041628691aed5f9d88f31"
-    };
-
-    navigator.sendBeacon(
-      "https://cloudflareinsights.com/beacon",
-      JSON.stringify(payload)
-    );
-  } catch (err) {
-    console.warn("Cloudflare track() error:", err);
-  }
-}
-
-/* ============================================================
-   EVENTOS AUTOMÁTICOS (podés borrarlos si no los querés)
-   Usá estos como plantillas según tu lógica del juego.
-   ============================================================ */
-
-/* Cuando el usuario toca "Comenzar" */
-document.getElementById("btnComenzar")?.addEventListener("click", () => {
-  track("calculo_comenzar", {
-    operacion: document.getElementById("operacion")?.value,
-    dificultad: document.getElementById("dificultad")?.value,
-    rondas: document.getElementById("rondas")?.value
+  document.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape' && !aboutModal?.hasAttribute('hidden')){
+      cerrarModal();
+    }
   });
 });
 
-/* Cuando finaliza una ronda correcta */
-function trackRespuestaCorrecta(valorCorrecto) {
-  track("calculo_respuesta_correcta", {
-    respuesta: valorCorrecto
-  });
+/* ======================================================
+   Tracking (Cloudflare / analíticas simples)
+   ====================================================== */
+function track(evento, data = {}){
+  if (!window.__cfBeacon) return;
+  try{
+    window.__cfBeacon.log(evento, data);
+  }catch(e){
+    // silencioso
+  }
 }
 
-/* Cuando finaliza una ronda incorrecta */
-function trackRespuestaIncorrecta(valorIncorrecto) {
-  track("calculo_respuesta_incorrecta", {
-    respuesta: valorIncorrecto
-  });
-}
-
-/* Cuando termina el juego completo */
 function trackFinDeJuego(stats) {
   // stats puede contener: { aciertos, total, tiempoPromedio }
   track("calculo_finalizado", stats);
