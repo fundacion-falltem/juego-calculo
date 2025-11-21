@@ -3,266 +3,296 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Cálculo amable para personas mayores y público general. Practicá sumas, restas, multiplicación y división con opciones grandes y tiempo por pregunta." />
-  <meta name="theme-color" content="#f3f4f6" />
-  <meta name="color-scheme" content="light" />
-  <meta name="referrer" content="strict-origin-when-cross-origin" />
 
   <title>Cálculo amable — Juegos Cognitivos FALLTEM</title>
+  <meta name="description"
+        content="Cálculo amable para practicar sumas, restas, operaciones mixtas, multiplicación y división con opciones grandes y tiempo por pregunta, pensado para personas mayores." />
 
-  <!-- PWA (si ya usás manifest e íconos) -->
-  <link rel="manifest" href="./manifest.webmanifest" />
-  <link rel="icon" href="./images/icon-192.png" sizes="192x192" />
-  <link rel="apple-touch-icon" href="./images/icon-192.png" />
-  
+  <!-- Fuente Montserrat -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Estilos propios -->
-  <link rel="stylesheet" href="./styles.css?v=1.9.2" />
+  <!-- Estilos propios (marca, modal, etc.) -->
+  <link rel="stylesheet" href="styles.css?v=1.0.0" />
 
-  <!-- Montserrat -->
-  <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet" />
-
-  <!-- Tailwind CDN (ok para este proyecto) -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+
   <!-- Cloudflare Web Analytics -->
-  <script
-    defer src="https://static.cloudflareinsights.com/beacon.min.js"
-    data-cf-beacon='{"token": "96e0f7e2211041628691aed5f9d88f31"}'>
+  <script defer
+          src="https://static.cloudflareinsights.com/beacon.min.js"
+          data-cf-beacon='{"token": "96e0f7e2211041628691aed5f9d88f31"}'>
   </script>
 
-
-  <style>
-    body {
-      font-family: "Montserrat", system-ui, -apple-system, Segoe UI, sans-serif;
-    }
-  </style>
+  <meta name="referrer" content="strict-origin-when-cross-origin" />
 </head>
-<body class="min-h-screen bg-slate-100 text-slate-900">
-  <!-- Link para lectores de pantalla -->
-  <a href="#juego"
-     class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4
-            focus:bg-lime-400 focus:text-slate-900 focus:px-3 focus:py-2
-            focus:rounded-lg focus:shadow-lg">
-    Saltar directamente al juego
-  </a>
+<body class="bg-slate-100 text-slate-900">
+  <!-- Enlace para lectores de pantalla / teclado -->
+  <a href="#juego" class="skip-link">Saltar directamente al juego</a>
 
-  <!-- Región aria-live -->
-  <div id="sr-updates" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
-
-  <!-- Botón flotante de ayuda -->
-  <div class="fixed z-20 top-4 right-4">
+  <!-- Botón de ayuda fijo arriba a la derecha -->
+  <div class="fixed top-5 right-5 z-40">
     <button id="aboutBtn"
-            class="w-10 h-10 rounded-full bg-white shadow-md border border-slate-200
-                   text-slate-900 text-lg font-bold hover:bg-lime-100 focus:outline-none
-                   focus:ring-2 focus:ring-lime-500 focus:ring-offset-2 focus:ring-offset-slate-100"
+            class="btn-ayuda inline-flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 bg-white text-slate-800 text-base font-extrabold shadow-md hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
             type="button"
             aria-haspopup="dialog"
             aria-controls="aboutModal"
             aria-expanded="false"
-            aria-label="¿Por qué este juego?">
+            aria-label="Ver explicación del juego">
       ?
     </button>
   </div>
 
-  <!-- Modal de ayuda -->
+  <!-- Contenedor principal -->
+  <div class="min-h-screen flex flex-col">
+    <main id="juego" role="main" aria-labelledby="titulo" class="flex-1 flex items-start justify-center px-4 py-10 md:py-12">
+      <!-- Tarjeta principal del juego -->
+      <section class="card w-full max-w-4xl bg-white rounded-[32px] shadow-xl px-6 sm:px-10 py-8 sm:py-10">
+        <!-- Header dentro de la tarjeta -->
+        <header class="header border-b border-slate-100 pb-6 mb-6" aria-describedby="intro">
+          <p class="eyebrow text-xs font-extrabold tracking-[0.25em] text-lime-700 uppercase mb-2">
+            Juegos Cognitivos FALLTEM
+          </p>
+          <h1 id="titulo" class="text-3xl sm:text-[2.5rem] md:text-[2.8rem] font-extrabold text-slate-900 leading-tight">
+            Cálculo amable
+          </h1>
+          <p id="intro" class="intro mt-3 text-base sm:text-lg text-slate-600 max-w-2xl">
+            Practicá sumas, restas, operaciones mixtas y multiplicación o división a tu ritmo.
+            Seleccioná la respuesta correcta entre cuatro opciones y seguí tu progreso ronda a ronda.
+          </p>
+        </header>
+
+        <!-- Controles -->
+        <div class="controles grid gap-5 md:grid-cols-3 md:items-start md:gap-6 mb-8" role="group" aria-label="Opciones del juego">
+          <!-- Operación -->
+          <div class="control space-y-2">
+            <label for="operacion" class="block text-sm font-extrabold text-slate-900">Operación</label>
+            <select id="operacion"
+                    aria-label="Elegir tipo de operación"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+              <option value="suma">Suma</option>
+              <option value="resta">Resta</option>
+              <option value="mixto">Mixto (suma y resta)</option>
+              <option value="multi">Multiplicación</option>
+              <option value="divi">División</option>
+            </select>
+            <p class="control__hint text-sm text-slate-500 leading-snug">
+              Podés elegir siempre la misma operación o mezclar suma y resta.
+            </p>
+          </div>
+
+          <!-- Rondas -->
+          <div class="control space-y-2">
+            <label for="rondas" class="block text-sm font-extrabold text-slate-900">Rondas</label>
+            <select id="rondas"
+                    aria-label="Elegir cantidad de rondas"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+              <option value="6">6</option>
+              <option value="8" selected>8</option>
+              <option value="10">10</option>
+            </select>
+            <p class="control__hint text-sm text-slate-500 leading-snug">
+              Cada ronda es una pregunta. Podés empezar con menos y después aumentar.
+            </p>
+          </div>
+
+          <!-- Dificultad -->
+          <div class="control space-y-2">
+            <label for="dificultad" class="block text-sm font-extrabold text-slate-900">Dificultad</label>
+            <select id="dificultad"
+                    aria-label="Elegir dificultad"
+                    class="w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-800 shadow-sm focus:outline-none focus:ring-2 focus:ring-sky-400 focus:border-sky-400">
+              <option value="facil" selected>Fácil (0–10)</option>
+              <option value="medio">Media (0–20)</option>
+              <option value="avanzado">Desafiante (0–50)</option>
+            </select>
+            <p class="control__hint text-sm text-slate-500 leading-snug">
+              Probá primero en Fácil. Cuando te resulte cómodo, subí un nivel.
+            </p>
+          </div>
+
+          <!-- Botones acción -->
+          <div class="control buttons md:col-span-3 mt-1 flex flex-col gap-3">
+            <button id="btnComenzar"
+                    type="button"
+                    class="btn principal w-full rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-extrabold py-3 text-lg shadow-md transition">
+              Comenzar
+            </button>
+            <button id="btnReiniciar"
+                    type="button"
+                    hidden
+                    class="btn secundario w-full rounded-full bg-slate-900 hover:bg-slate-800 text-slate-50 font-bold py-3 text-base shadow-md transition">
+              Volver a jugar
+            </button>
+            <button id="btnPause"
+                    type="button"
+                    hidden
+                    class="btn texto self-start text-sm text-slate-500 hover:text-slate-700 underline-offset-4 hover:underline">
+              Pausar
+            </button>
+          </div>
+        </div>
+
+        <!-- Juego / Enunciado -->
+        <section class="juego" aria-label="Juego de cálculo">
+          <h2 class="sr-only">Juego de operaciones</h2>
+
+          <p id="enunciado"
+            class="enunciado text-center text-2xl sm:text-3xl md:text-[2rem] font-extrabold text-slate-900 leading-tight">
+            Presioná “Comenzar” para iniciar.
+          </p>
+
+          <p id="feedback"
+             class="feedback muted mt-3 text-center text-base font-semibold text-slate-500"
+             aria-live="polite"></p>
+
+          <!-- Opciones -->
+          <div id="opciones"
+               class="opciones mt-6 grid gap-3 sm:grid-cols-2"
+               role="group"
+               aria-label="Opciones de respuesta">
+            <!-- Botones de respuesta generados por JS -->
+          </div>
+
+          <!-- Progreso -->
+          <div class="progreso mt-6" aria-label="Progreso de la sesión">
+            <div class="progreso-header flex items-center justify-between text-xs sm:text-sm text-slate-500 mb-2">
+              <span id="progTxt">0/0</span>
+              <span class="aciertos">
+                Aciertos: <strong id="aciertos" class="font-bold">0</strong>
+              </span>
+            </div>
+            <div class="progreso-bar h-2 rounded-full bg-slate-200 overflow-hidden">
+              <div id="pbFill" class="h-full w-0 bg-lime-400 transition-[width] duration-300 ease-out"></div>
+            </div>
+          </div>
+
+          <!-- Timer -->
+          <div class="timer mt-5" aria-live="off">
+            <p id="timerText"
+               class="timer-text text-center text-sm font-semibold text-slate-700"
+               aria-hidden="true"></p>
+            <div class="timerBar h-3 rounded-full bg-slate-200 overflow-hidden mt-1"
+                 aria-hidden="true">
+              <div id="timerFill"
+                   data-level="normal"
+                   class="h-full w-0 bg-slate-800 transition-[width] duration-100 ease-linear">
+              </div>
+            </div>
+          </div>
+
+          <!-- Acciones finales -->
+          <div id="finalActions"
+               class="final-actions mt-6 flex flex-col gap-3 items-stretch sm:items-center"
+               hidden></div>
+
+          <!-- Región para lector de pantalla -->
+          <div id="sr-updates" class="sr-only" aria-live="polite"></div>
+        </section>
+
+       <!-- Footer -->
+          <footer class="page-footer py-4 text-center text-[11px] sm:text-xs text-slate-400">
+            Desarrollado por
+            <a href="https://falltem.org/" target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-slate-700">
+              FALLTEM
+            </a>
+            · Código abierto MIT · Actividad lúdica; estos juegos no constituyen práctica médica.
+          </footer>
+        </div>
+      </section>
+    </main>
+
+    
+
+  <!-- Modal de ayuda con 2 solapas -->
   <div id="aboutModal"
-       class="fixed inset-0 z-30 flex items-center justify-center px-4 bg-slate-900/60"
+       class="modal-backdrop"
        role="dialog"
        aria-modal="true"
        aria-labelledby="aboutTitle"
-       aria-hidden="true"
        hidden>
-    <div class="relative max-w-xl w-full bg-white rounded-2xl shadow-2xl p-6 sm:p-7">
-      <header class="flex items-start justify-between mb-3">
-        <h2 id="aboutTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">
-          ¿Por qué este juego?
-        </h2>
+    <div class="modal-card bg-white rounded-2xl shadow-2xl p-5 sm:p-6 md:p-7 border border-slate-200">
+      <header class="modal-header flex items-center justify-between gap-3 mb-3 sm:mb-4">
+        <h2 id="aboutTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">Cálculo amable</h2>
         <button id="aboutCloseX"
-                class="ml-3 text-slate-400 hover:text-slate-600 focus:outline-none"
+                class="modal-close text-slate-400 hover:text-slate-600 text-lg"
                 type="button"
-                aria-label="Cerrar ventana de información">
+                aria-label="Cerrar explicación">
           ✕
         </button>
       </header>
 
-      <p class="text-sm sm:text-base text-slate-700 mb-3">
-        Este ejercicio estimula <strong>cálculo básico</strong>, <strong>atención</strong> y
-        <strong>velocidad de procesamiento</strong>, habilidades importantes para mantener la mente activa
-        (Kable et al., 2014). Podés jugar sin límite de sesiones, siempre a tu ritmo.
-      </p>
+      <!-- Tabs -->
+      <div class="modal-tabs flex gap-4 border-b border-slate-200 mb-4">
+        <button id="tab-porques"
+                class="tab-btn tab-btn--active pb-2 text-sm sm:text-base font-semibold border-b-2 border-lime-400 text-slate-900"
+                type="button">
+          ¿Por qué este juego?
+        </button>
+        <button id="tab-como"
+                class="tab-btn pb-2 text-sm sm:text-base font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700"
+                type="button">
+          ¿Cómo se juega?
+        </button>
+      </div>
 
-      <ul class="list-disc list-inside text-sm sm:text-base text-slate-700 space-y-1 mb-4">
-        <li>Hacelo en <strong>sesiones cortas</strong> (5–10 min), 2–3 veces por semana.</li>
-        <li>Empezá en <strong>Fácil</strong> y subí la dificultad cuando te resulte cómodo.</li>
-        <li>Respondé con <strong>botones grandes</strong> o usando las teclas <strong>A–D</strong>, <strong>1–4</strong> o <strong>Enter</strong>.</li>
-      </ul>
+      <!-- Contenido: ¿Por qué este juego? -->
+      <section id="content-porques" class="space-y-3">
+        <p class="modal-text text-sm sm:text-base text-slate-700">
+          Este ejercicio estimula <strong>cálculo básico</strong>,
+          <strong>atención</strong> y <strong>velocidad de procesamiento</strong>,
+          habilidades importantes para mantener la mente activa.
+          Podés jugar sin límite de sesiones, siempre a tu ritmo.
+        </p>
 
-      <p class="text-xs text-slate-500 mb-1">
-        <small>ℹ️ <strong>Actividad lúdica:</strong> no es práctica médica. No recolectamos datos personales.</small>
-      </p>
-      <p class="text-xs text-slate-500 mb-4">
-        <small id="versionLabel"></small>
-      </p>
+        <ul class="modal-list list-disc list-inside text-sm sm:text-base text-slate-700 space-y-1">
+          <li>Hacelo en <strong>sesiones cortas</strong> (5–10 min), 2–3 veces por semana.</li>
+          <li>Empezá en <strong>Fácil</strong> y subí la dificultad cuando te resulte cómodo.</li>
+          <li>Podés responder con <strong>botones grandes</strong> o usando A–D / 1–4 / Enter.</li>
+        </ul>
 
-      <div class="mt-4 flex justify-end">
+        <p class="modal-note text-[11px] text-slate-500">
+          ℹ️ <strong>Actividad lúdica:</strong> no es práctica médica. No recolectamos datos personales.
+        </p>
+
+        <p class="modal-version text-[11px] text-slate-400">
+          <small id="versionLabel"></small>
+        </p>
+      </section>
+
+      <!-- Contenido: ¿Cómo se juega? -->
+      <section id="content-como" class="space-y-3" hidden>
+        <p class="modal-text text-sm sm:text-base text-slate-700">
+          El objetivo es resolver operaciones sencillas y elegir la respuesta correcta
+          entre cuatro opciones. Cada ronda tiene un tiempo aproximado, pero podés jugar
+          con tranquilidad.
+        </p>
+
+        <ol class="modal-list modal-list--ordered list-decimal list-inside text-sm sm:text-base text-slate-700 space-y-1">
+          <li>Elegí la <strong>operación</strong>, la <strong>dificultad</strong> y la cantidad de <strong>rondas</strong>.</li>
+          <li>Presioná el botón <strong>“Comenzar”</strong>.</li>
+          <li>Leé la operación (por ejemplo: <em>7 + 5 = ?</em>).</li>
+          <li>Seleccioná una de las 4 respuestas. Podés usar el mouse o el teclado (A–D o 1–4).</li>
+          <li>Si el tiempo se termina, se muestra la respuesta correcta y pasás a la siguiente.</li>
+          <li>Al finalizar, vas a ver tu resultado y una recomendación para seguir practicando.</li>
+        </ol>
+
+        <p class="modal-note text-[11px] text-slate-500">
+          Consejo: si sentís que te cuesta, probá con <strong>menos rondas</strong> o una
+          <strong>dificultad más fácil</strong>. Siempre podés volver a intentarlo.
+        </p>
+      </section>
+
+      <div class="modal-actions mt-5 flex justify-end">
         <button id="aboutClose"
-                class="btn principal inline-flex items-center justify-center rounded-full
-                       bg-lime-500 hover:bg-lime-600 text-slate-900 font-bold
-                       text-base py-2 px-5 shadow-md transition"
+                class="btn principal inline-flex items-center justify-center rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-bold text-sm sm:text-base py-2.5 px-5 shadow-md transition"
                 type="button">
           Entendido
         </button>
       </div>
     </div>
   </div>
-
-  <!-- Contenedor principal -->
-  <main class="min-h-screen flex items-center justify-center px-4 py-6 sm:py-8" role="main" aria-labelledby="titulo">
-    <div class="w-full max-w-4xl bg-white shadow-2xl rounded-3xl px-6 py-8 sm:px-10 sm:py-10">
-      <!-- Encabezado -->
-      <header class="mb-8">
-        <p class="text-xs sm:text-sm font-semibold uppercase tracking-[0.2em] text-lime-600 mb-1">
-          Juegos Cognitivos FALLTEM
-        </p>
-        <h1 id="titulo" class="text-3xl sm:text-4xl font-black leading-tight">
-          Cálculo amable
-        </h1>
-        <p class="mt-3 text-base sm:text-lg text-slate-700 max-w-2xl">
-          Practicá sumas, restas, multiplicación y división a tu ritmo. Seleccioná la respuesta correcta
-          y disfrutá del progreso. Actividad lúdica, no médica.
-        </p>
-      </header>
-
-      <!-- Controles -->
-      <section class="card mb-4" aria-label="Configuración del juego">
-        <div class="controles">
-          <!-- Operación -->
-          <div class="control">
-            <label for="operacion" class="text-xs font-semibold uppercase tracking-wide text-slate-600">
-              Operación
-            </label>
-            <select id="operacion"
-                    class="mt-1 block w-full rounded-xl border border-slate-300 bg-white
-                           py-2.5 px-3 text-base text-slate-900 shadow-sm focus:outline-none
-                           focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-              <option value="suma" selected>Suma</option>
-              <option value="resta">Resta</option>
-              <option value="mixto">Mixto (suma y resta)</option>
-              <option value="multi">Multiplicación</option>
-              <option value="divi">División</option>
-            </select>
-          </div>
-
-          <!-- Dificultad -->
-          <div class="control">
-            <label for="dificultad" class="text-xs font-semibold uppercase tracking-wide text-slate-600">
-              Dificultad
-            </label>
-            <select id="dificultad"
-                    class="mt-1 block w-full rounded-xl border border-slate-300 bg-white
-                           py-2.5 px-3 text-base text-slate-900 shadow-sm focus:outline-none
-                           focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-              <option value="facil" selected>Fácil (0–10)</option>
-              <option value="medio">Media (0–20)</option>
-              <option value="avanzado">Desafiante (0–50)</option>
-            </select>
-          </div>
-
-          <!-- Rondas -->
-          <div class="control">
-            <label for="rondas" class="text-xs font-semibold uppercase tracking-wide text-slate-600">
-              Rondas
-            </label>
-            <select id="rondas"
-                    class="mt-1 block w-full rounded-xl border border-slate-300 bg-white
-                           py-2.5 px-3 text-base text-slate-900 shadow-sm focus:outline-none
-                           focus:ring-2 focus:ring-lime-500 focus:border-lime-500">
-              <option value="6">6</option>
-              <option value="8" selected>8</option>
-              <option value="10">10</option>
-            </select>
-          </div>
-
-          <!-- Botones -->
-          <div class="control buttons flex flex-col justify-end mt-4 sm:mt-1">
-            <button id="btnComenzar"
-                    class="btn principal w-full inline-flex items-center justify-center rounded-full
-                           bg-lime-500 hover:bg-lime-600 text-slate-900 font-extrabold
-                           text-base sm:text-lg py-2.5 px-4 shadow-md transition"
-                    type="button">
-              Comenzar
-            </button>
-
-            <button id="btnReiniciar"
-                    class="btn secundario w-full inline-flex items-center justify-center rounded-full
-                           border border-slate-900 bg-slate-900 hover:bg-slate-800
-                           text-white font-semibold text-base py-2.5 px-4 transition"
-                    type="button"
-                    hidden>
-              Volver a jugar
-            </button>
-          </div>
-        </div>
-      </section>
-
-      <!-- Juego -->
-      <section id="juego" class="card" aria-label="Juego de cálculo">
-        <!-- Timer -->
-        <p id="timerText" class="timer-text text-sm text-slate-800 mb-1"></p>
-        <div class="timerBar bg-slate-200 mb-4 rounded-full overflow-hidden">
-          <div id="timerFill" class="h-full w-0"></div>
-        </div>
-
-        <!-- Enunciado -->
-        <h2 id="enunciado"
-            class="enunciado text-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-slate-900 mb-4">
-          Presioná “Comenzar” para iniciar.
-        </h2>
-
-        <!-- Opciones -->
-        <div id="opciones"
-             class="opciones grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2"
-             aria-label="Opciones de respuesta">
-        </div>
-
-        <!-- Feedback -->
-        <p id="feedback" class="feedback muted text-sm text-slate-700 mt-3"></p>
-
-        <!-- Progreso + aciertos (sin cero suelto) -->
-        <div class="estado mt-4">
-          <div class="progresoBar bg-slate-200 rounded-full overflow-hidden mb-2">
-            <div id="pbFill" class="h-2 w-0 rounded-full"></div>
-          </div>
-          <p class="text-xs text-slate-600 text-center">
-            Progreso:
-            <span id="progTxt">0/0</span>
-            · Aciertos:
-            <span id="aciertos">0</span>
-          </p>
-        </div>
-
-        <!-- Acciones finales, se llenan al terminar -->
-        <div id="finalActions" class="cta-buttons mt-4" hidden></div>
-      </section>
-
-      <!-- Footer -->
-      <footer class="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-500 text-center"
-              role="contentinfo"
-              aria-label="Créditos y aviso">
-        <p>
-          Desarrollado por
-          <a href="https://falltem.org/" target="_blank" rel="noopener" class="underline">FALLTEM</a>
-          · Código abierto MIT · Actividad lúdica; estos juegos no constituyen práctica médica.
-        </p>
-      </footer>
-    </div>
-  </main>
-
-  <noscript>
-    <p style="margin:1rem">Este juego necesita JavaScript para funcionar.</p>
-  </noscript>
 
   <!-- Lógica del juego -->
   <script src="app.js?v=1.9.2" defer></script>

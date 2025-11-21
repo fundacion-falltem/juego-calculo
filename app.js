@@ -1,7 +1,7 @@
 'use strict';
 
 document.addEventListener('DOMContentLoaded', () => {
-  const VERSION = 'v1.9.2 (ajustes UI)';
+  const VERSION = 'v1.9.2 (ajustes UI + tabs ayuda)';
   const versionEl = document.getElementById('versionLabel');
   if (versionEl) versionEl.textContent = VERSION;
 
@@ -14,56 +14,70 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const btnComenzar  = document.getElementById('btnComenzar');
   const btnReiniciar = document.getElementById('btnReiniciar');
+  const btnPause     = document.getElementById('btnPause');
 
   const enunciado  = document.getElementById('enunciado');
   const feedback   = document.getElementById('feedback');
   const opcionesEl = document.getElementById('opciones');
 
-  const pbFill     = document.getElementById('pbFill');
-  const progTxt    = document.getElementById('progTxt');
+  const pbFill   = document.getElementById('pbFill');
+  const progTxt  = document.getElementById('progTxt');
   const aciertosEl = document.getElementById('aciertos');
 
-  const timerText  = document.getElementById('timerText');
-  const timerFill  = document.getElementById('timerFill');
-  const timerBar   = document.querySelector('.timerBar');
+  const timerText = document.getElementById('timerText');
+  const timerFill = document.getElementById('timerFill');
+  const timerBar  = document.querySelector('.timerBar');
 
   const finalActions = document.getElementById('finalActions');
-  const srUpdates    = document.getElementById('sr-updates');
+
+  const srUpdates = document.getElementById('sr-updates');
 
   // Modal ayuda
-  const aboutBtn   = document.getElementById('aboutBtn');
-  const aboutModal = document.getElementById('aboutModal');
-  const aboutClose = document.getElementById('aboutClose');
-  const aboutCloseX= document.getElementById('aboutCloseX');
+  const aboutBtn    = document.getElementById('aboutBtn');
+  const aboutModal  = document.getElementById('aboutModal');
+  const aboutClose  = document.getElementById('aboutClose');
+  const aboutCloseX = document.getElementById('aboutCloseX');
 
-  if (aboutModal) {
-    aboutModal.hidden = true;
-    aboutModal.setAttribute('aria-hidden', 'true');
-  }
+  // Tabs del modal
+  const tabPorques      = document.getElementById('tab-porques');
+  const tabComo         = document.getElementById('tab-como');
+  const contentPorques  = document.getElementById('content-porques');
+  const contentComo     = document.getElementById('content-como');
 
   // ============================
   // ESTADO
   // ============================
-  let operacion     = opSel?.value || 'suma';
-  let dificultad    = difSel?.value || 'facil';
-  let rondasTotales = Number(ronSel?.value || 8);
-
+  let rondasTotales = 8;
   let rondaActual   = 0;
   let aciertos      = 0;
+
+  let operacion     = 'suma';   // suma / resta / mixto / multi / divi
+  let dificultad    = 'facil';  // facil / medio / avanzado
+
   let respuestaCorrecta = null;
 
+  // Timer
   let timerId   = null;
   let timeLeft  = 0;
   let timeMax   = 0;
+  let paused    = false;
 
-  let keyHandlerRef = null;
+  // Métrica simple
   let totalTiempoAcumuladoMs = 0;
+
+  // Handler de teclado
+  let keyHandlerRef = null;
 
   // ============================
   // UTILIDADES
   // ============================
-  const rand = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
-  const setTxt = (el, txt) => { if (el) el.textContent = String(txt); };
+  const rand = (min, max) =>
+    Math.floor(Math.random() * (max - min + 1)) + min;
+
+  const setTxt = (el, txt) => {
+    if (el) el.textContent = String(txt);
+  };
+
   const barajar = (arr) => {
     for (let i = arr.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -71,7 +85,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     return arr;
   };
-  const announce = (msg) => { if (srUpdates) srUpdates.textContent = msg; };
+
+  const announce = (msg) => {
+    if (srUpdates) srUpdates.textContent = msg;
+  };
 
   function rangoPorDificultad() {
     if (dificultad === 'facil')  return [0, 10];
@@ -89,33 +106,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const set = new Set([correcta]);
     const candidatos = [];
 
-    for (let d of [1,2,3]) {
+    for (let d of [1, 2, 3]) {
       candidatos.push(correcta + d, correcta - d);
     }
+
     candidatos.push(min, max);
-    for (let i = 0; i < 6; i++) candidatos.push(rand(min, max));
+    for (let i = 0; i < 6; i++) {
+      candidatos.push(rand(min, max));
+    }
 
     const result = [];
     for (const n of candidatos) {
-      if (Number.isInteger(n) && n >= min && n <= max && !set.has(n)) {
-        set.add(n);
-        result.push(n);
-        if (result.length >= 3) break;
-      }
-    }
-    while (result.length < 3) {
-      const n = rand(min, max);
-      if (!set.has(n)) {
+      if (
+        Number.isInteger(n) &&
+        n >= min && n <= max &&
+        !set.has(n)
+      ) {
         set.add(n);
         result.push(n);
       }
+      if (result.length >= 6) break;
     }
-    return barajar([correcta, ...result]);
+
+    return result;
   }
 
   // ============================
   // TIMER
   // ============================
+  function showTimer() {
+    if (!timerText || !timerBar) return;
+    timerText.style.display = '';
+    timerText.setAttribute('aria-hidden', 'false');
+    timerBar.style.display = '';
+    timerBar.setAttribute('aria-hidden', 'false');
+  }
+
+  function hideTimer() {
+    if (!timerText || !timerBar) return;
+    timerText.style.display = 'none';
+    timerText.setAttribute('aria-hidden', 'true');
+    timerBar.style.display = 'none';
+    timerBar.setAttribute('aria-hidden', 'true');
+  }
+
+  function stopTimer() {
+    if (timerId) {
+      clearInterval(timerId);
+      timerId = null;
+    }
+  }
+
   function startTimer(ms) {
     stopTimer();
     timeMax = ms;
@@ -132,29 +173,24 @@ document.addEventListener('DOMContentLoaded', () => {
         updateTimerUI();
       }
     }, 100);
-    timerBar?.classList.remove('hidden');
-  }
-
-  function stopTimer() {
-    if (timerId !== null) {
-      clearInterval(timerId);
-      timerId = null;
-    }
-  }
-
-  function hideTimer() {
-    if (timerBar) timerBar.classList.add('hidden');
-    setTxt(timerText, '');
-    timerFill.style.width = '0%';
-    timerFill.dataset.level = 'normal';
   }
 
   function updateTimerUI() {
-    const s = Math.ceil(timeLeft / 1000);
-    setTxt(timerText, s > 0 ? `⏱ Tiempo: ${s} s` : '⏱ Tiempo: 0 s');
+    if (!timerText || !timerFill) return;
 
-    const pct = Math.max(0, Math.min(100, Math.round((timeLeft / timeMax) * 100)));
-    timerFill.style.width = pct + '%';
+    const s = Math.ceil(timeLeft / 1000);
+    setTxt(timerText, s > 0 ? `Tiempo: ${s} s` : 'Tiempo: 0 s');
+
+    const alerta = timeLeft <= 3000 && timeLeft > 0;
+    timerText.classList.toggle('timer-alert', alerta);
+    timerText.classList.toggle('timer-pulse', alerta);
+    if (alerta && navigator.vibrate) navigator.vibrate(40);
+
+    const pct = timeMax > 0
+      ? Math.max(0, Math.min(100, Math.round((timeLeft / timeMax) * 100)))
+      : 0;
+
+    timerFill.style.width = `${pct}%`;
 
     let level = 'normal';
     if (timeLeft > 0) {
@@ -162,60 +198,55 @@ document.addEventListener('DOMContentLoaded', () => {
       else if (pct <= 35) level = 'warn';
     }
     timerFill.dataset.level = level;
-
-    const alerta = (level === 'alert');
-    timerText.classList.toggle('timer-alert', alerta);
-    timerText.classList.toggle('timer-pulse', alerta);
-    if (alerta && navigator.vibrate) navigator.vibrate(40);
   }
 
+  // Pausa/Reanudar
+  btnPause?.addEventListener('click', () => {
+    if (!paused) {
+      stopTimer();
+      btnPause.textContent = 'Reanudar';
+      paused = true;
+    } else {
+      startTimer(timeLeft);
+      btnPause.textContent = 'Pausar';
+      paused = false;
+    }
+  });
+
   // ============================
-  // OPCIONES Y TECLADO
+  // OPCIONES / UI
   // ============================
-  function renderOpciones(opciones) {
-    opcionesEl.innerHTML = '';
-    const letras = ['A','B','C','D'];
-
-    opciones.forEach((valor, idx) => {
-      const btn = document.createElement('button');
-      btn.type = 'button';
-      btn.className = 'opcion-btn';
-
-      const tag = document.createElement('span');
-      tag.className = 'tag';
-      tag.textContent = letras[idx] + '.';
-
-      const span = document.createElement('span');
-      span.className = 'texto';
-      span.textContent = String(valor);
-
-      btn.appendChild(tag);
-      btn.appendChild(span);
-
-      btn.dataset.valor = String(valor);
-
-      btn.addEventListener('click', () => {
-        manejarRespuesta(Number(btn.dataset.valor));
-      });
-
-      opcionesEl.appendChild(btn);
+  function limpiarEstadosOpciones() {
+    if (!opcionesEl) return;
+    opcionesEl.querySelectorAll('button').forEach((b) => {
+      b.classList.remove('is-selected', 'ok', 'bad', 'marcada');
+      b.disabled = false;
     });
+  }
 
-    attachKeyHandler();
+  function marcarSeleccion(btn) {
+    if (!opcionesEl) return;
+    opcionesEl.querySelectorAll('button').forEach((x) => {
+      x.classList.remove('is-selected');
+    });
+    btn.classList.add('is-selected');
   }
 
   function attachKeyHandler() {
-    if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
+    if (keyHandlerRef) {
+      document.removeEventListener('keydown', keyHandlerRef);
+    }
 
     keyHandlerRef = (e) => {
       if (!opcionesEl || opcionesEl.children.length === 0) return;
-      const buttons = Array.from(opcionesEl.children);
-      const letters = ['A','B','C','D'];
-      const key = e.key;
-      const up   = ['ArrowUp','ArrowLeft'].includes(key);
-      const down = ['ArrowDown','ArrowRight'].includes(key);
 
-      // A–D
+      const buttons = Array.from(opcionesEl.children);
+      const letters = ['A', 'B', 'C', 'D'];
+      const key = e.key;
+      const up   = ['ArrowUp', 'ArrowLeft'].includes(key);
+      const down = ['ArrowDown', 'ArrowRight'].includes(key);
+
+      // Letras A–D
       const kU = key.toUpperCase();
       const letterIdx = letters.indexOf(kU);
       if (letterIdx >= 0 && buttons[letterIdx]) {
@@ -223,168 +254,240 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
       }
 
-      // 1–4
+      // Números 1–4
       if (/^[1-4]$/.test(key)) {
         const idx = Number(key) - 1;
-        buttons[idx]?.click();
+        if (buttons[idx]) {
+          buttons[idx].click();
+        }
         return;
       }
 
-      // Navegación
+      // Navegación con flechas (arriba/abajo)
       const current = opcionesEl.querySelector('.is-selected') || buttons[0];
-      let idx = buttons.indexOf(current);
-
+      let i = buttons.indexOf(current);
       if (up) {
-        idx = (idx - 1 + buttons.length) % buttons.length;
-        buttons[idx].focus();
+        i = (i - 1 + buttons.length) % buttons.length;
+        buttons[i].focus();
+        marcarSeleccion(buttons[i]);
         return;
       }
       if (down) {
-        idx = (idx + 1) % buttons.length;
-        buttons[idx].focus();
+        i = (i + 1) % buttons.length;
+        buttons[i].focus();
+        marcarSeleccion(buttons[i]);
         return;
       }
 
-      // Activación
+      // Enter / espacio activa
       if (key === 'Enter' || key === ' ') {
-        current?.click();
+        (opcionesEl.querySelector('.is-selected') || buttons[0])?.click();
       }
     };
 
     document.addEventListener('keydown', keyHandlerRef);
   }
 
+  function renderOpciones(lista) {
+    if (!opcionesEl) return;
+
+    const letras = ['A', 'B', 'C', 'D'];
+    opcionesEl.innerHTML = '';
+
+    lista.forEach((val, i) => {
+      const btn = document.createElement('button');
+      btn.className = 'opcion-btn';
+      btn.type = 'button';
+      btn.setAttribute('data-val', String(val));
+      btn.setAttribute('aria-label', `Opción ${letras[i]}: ${val}`);
+      btn.innerHTML = `<strong>${letras[i]}.</strong> ${val}`;
+
+      btn.addEventListener('pointerdown', () => marcarSeleccion(btn));
+      btn.addEventListener('focus', () => marcarSeleccion(btn));
+      btn.addEventListener('mouseenter', () => marcarSeleccion(btn));
+      btn.addEventListener('blur', () => btn.classList.remove('is-selected'));
+
+      btn.addEventListener('click', () => {
+        elegir(val, btn);
+      });
+
+      opcionesEl.appendChild(btn);
+    });
+
+    attachKeyHandler();
+    opcionesEl.querySelector('button')?.focus();
+  }
+
+  // ============================
+  // PROGRESO / UI GENERAL
+  // ============================
+  function actualizarProgreso() {
+    setTxt(progTxt, `${Math.min(rondaActual, rondasTotales)}/${rondasTotales}`);
+    setTxt(aciertosEl, aciertos);
+
+    const pct = rondasTotales > 0
+      ? Math.round((Math.min(rondaActual, rondasTotales) / rondasTotales) * 100)
+      : 0;
+
+    if (pbFill) pbFill.style.width = `${pct}%`;
+  }
+
+  function bloquearOpciones() {
+    if (!opcionesEl) return;
+    opcionesEl.querySelectorAll('button').forEach((b) => {
+      b.disabled = true;
+    });
+  }
+
+  function marcarCorrectaVisual() {
+    if (!opcionesEl) return;
+
+    const correctoBtn = Array.from(opcionesEl.children)
+      .find((el) => Number(el.getAttribute('data-val')) === respuestaCorrecta);
+
+    if (correctoBtn) {
+      correctoBtn.classList.add('ok');
+    }
+  }
+
   // ============================
   // LÓGICA DEL JUEGO
   // ============================
   function nuevaPregunta() {
+    // Determinar operación efectiva (si mixto, elegimos suma o resta al azar)
+    let op = operacion;
+    if (op === 'mixto') {
+      op = Math.random() < 0.5 ? 'suma' : 'resta';
+    }
+
     let [min, max] = rangoPorDificultad();
+
+    // Ajustes para multi y divi (tablas acotadas)
+    if (op === 'multi' || op === 'divi') {
+      if (dificultad === 'facil') {
+        min = 0; max = 10;
+      } else if (dificultad === 'medio') {
+        min = 0; max = 12;
+      } else {
+        min = 0; max = 15;
+      }
+    }
+
     let a = rand(min, max);
     let b = rand(min, max);
 
-    const op = operacion;
-
     if (op === 'resta') {
-      if (b > a) [a,b] = [b,a];
+      if (b > a) [a, b] = [b, a];
       respuestaCorrecta = a - b;
       setTxt(enunciado, `${a} − ${b} = ?`);
     } else if (op === 'multi') {
       respuestaCorrecta = a * b;
       setTxt(enunciado, `${a} × ${b} = ?`);
     } else if (op === 'divi') {
-      b = b || 1;
+      b = Math.max(1, b);
       const prod = a * b;
       respuestaCorrecta = a;
       setTxt(enunciado, `${prod} ÷ ${b} = ?`);
-    } else if (op === 'mixto') {
-      const isSuma = Math.random() < 0.5;
-      if (!isSuma && b > a) [a,b] = [b,a];
-      respuestaCorrecta = isSuma ? a + b : a - b;
-      setTxt(enunciado, `${a} ${isSuma ? '+' : '−'} ${b} = ?`);
-    } else {
-      // suma
+    } else { // suma (o mixto→suma)
       respuestaCorrecta = a + b;
       setTxt(enunciado, `${a} + ${b} = ?`);
     }
 
-    const opciones = generarDistractores(respuestaCorrecta, min, max);
+    // Rango para distractores
+    const resMin = 0;
+    const resMax =
+      op === 'multi' ? max * max :
+      op === 'divi'  ? max :
+      op === 'resta' ? max :
+      max + max;
+
+    const distractores = generarDistractores(respuestaCorrecta, resMin, resMax).slice(0, 6);
+    const opciones = barajar([respuestaCorrecta, ...barajar(distractores).slice(0, 3)]);
+
+    limpiarEstadosOpciones();
     renderOpciones(opciones);
+
+    setTxt(feedback, '');
+    feedback.className = 'feedback muted';
+    finalActions.hidden = true;
+
+    actualizarProgreso();
+    showTimer();
+
+    const base = tiempoBasePorDificultad();
+    const extraOp = (op === 'multi' || op === 'divi') ? 2000 : 0;
+    startTimer(base + extraOp);
+
+    if (btnPause) {
+      btnPause.hidden = false;
+      btnPause.textContent = 'Pausar';
+    }
+    paused = false;
+
+    announce(`Nueva pregunta: ${enunciado.textContent}`);
+  }
+
+  function elegir(valor, btn) {
+    stopTimer();
+
+    // Tiempo invertido (aprox)
+    totalTiempoAcumuladoMs += Math.min(timeMax, Math.max(0, timeMax - timeLeft));
+
+    const ok = (valor === respuestaCorrecta);
+    bloquearOpciones();
+
+    btn.classList.add('marcada');
+    btn.classList.add(ok ? 'ok' : 'bad');
+    if (!ok) marcarCorrectaVisual();
+
+    if (ok) {
+      aciertos++;
+      setTxt(feedback, '✔ ¡Correcto!');
+      feedback.className = 'feedback ok';
+      announce(`Correcto. Respuesta ${valor}. Progreso ${rondaActual + 1}/${rondasTotales}.`);
+    } else {
+      setTxt(feedback, `✘ Casi. La respuesta correcta era: ${respuestaCorrecta}.`);
+      feedback.className = 'feedback bad';
+      announce(`Incorrecto. La respuesta correcta era ${respuestaCorrecta}. Progreso ${rondaActual + 1}/${rondasTotales}.`);
+    }
 
     rondaActual++;
     actualizarProgreso();
 
-    const baseMs = tiempoBasePorDificultad();
-    startTimer(baseMs);
-  }
-
-  function actualizarProgreso() {
-    setTxt(progTxt, `${Math.min(rondaActual, rondasTotales)}/${rondasTotales}`);
-    setTxt(aciertosEl, aciertos); // solo número, el texto “Aciertos:” está en el HTML
-    const pct = Math.round((Math.min(rondaActual, rondasTotales) / rondasTotales) * 100);
-    pbFill.style.width = pct + '%';
-  }
-
-  function bloquearOpciones() {
-    opcionesEl.querySelectorAll('button').forEach(b => b.disabled = true);
-  }
-
-  function marcarCorrectaYSeleccionada(valorSeleccionado) {
-    const buttons = Array.from(opcionesEl.querySelectorAll('button'));
-    let correctaBtn = null;
-    let seleccionadaBtn = null;
-
-    buttons.forEach(btn => {
-      const valor = Number(btn.dataset.valor);
-      if (valor === respuestaCorrecta) correctaBtn = btn;
-      if (valor === valorSeleccionado) seleccionadaBtn = btn;
-    });
-
-    if (correctaBtn) correctaBtn.classList.add('ok');
-    if (seleccionadaBtn && seleccionadaBtn !== correctaBtn) {
-      seleccionadaBtn.classList.add('bad','is-selected');
-    } else if (seleccionadaBtn) {
-      seleccionadaBtn.classList.add('is-selected');
-    }
-  }
-
-  function manejarRespuesta(valorSeleccionado) {
-    if (respuestaCorrecta == null) return;
-
-    stopTimer();
-    bloquearOpciones();
-
-    const correcta = (valorSeleccionado === respuestaCorrecta);
-    if (correcta) {
-      aciertos++;
-      setTxt(feedback, '¡Bien! Respuesta correcta.');
-      feedback.className = 'feedback ok';
-      announce('Respuesta correcta');
+    if (rondaActual >= rondasTotales) {
+      setTimeout(() => finalizarSesion(), 700);
     } else {
-      setTxt(feedback, `La respuesta correcta era ${respuestaCorrecta}.`);
-      feedback.className = 'feedback bad';
-      announce('Respuesta incorrecta');
+      setTimeout(() => nuevaPregunta(), 700);
     }
-
-    marcarCorrectaYSeleccionada(valorSeleccionado);
-    actualizarProgreso();
-
-    const delay = 800;
-    totalTiempoAcumuladoMs += delay;
-
-    setTimeout(() => {
-      if (rondaActual >= rondasTotales) {
-        finalizarSesion();
-      } else {
-        nuevaPregunta();
-      }
-    }, delay);
   }
 
   function tiempoAgotado() {
-    if (respuestaCorrecta == null) return;
-
     bloquearOpciones();
-    marcarCorrectaYSeleccionada(undefined);
+    marcarCorrectaVisual();
 
-    setTxt(feedback, 'Se acabó el tiempo.');
+    setTxt(feedback, `⏰ Tiempo agotado. La respuesta correcta era: ${respuestaCorrecta}.`);
     feedback.className = 'feedback bad';
-    announce('Tiempo agotado');
+    announce(`Tiempo agotado. La respuesta correcta era ${respuestaCorrecta}.`);
 
     totalTiempoAcumuladoMs += tiempoBasePorDificultad();
 
+    rondaActual++;
+    actualizarProgreso();
+
     if (rondaActual >= rondasTotales) {
-      finalizarSesion();
+      setTimeout(() => finalizarSesion(), 800);
     } else {
       setTimeout(() => nuevaPregunta(), 800);
     }
   }
 
   // ============================
-  // CIERRE
+  // CIERRE / RESUMEN
   // ============================
   function cierreDeSesion({ aciertos, rondas, tiempoPromedioMs = null }) {
     const pct = Math.round((aciertos / Math.max(1, rondas)) * 100);
-    let titulo = '', recomendacion = '';
+    let titulo = '';
+    let recomendacion = '';
 
     if (pct >= 90) {
       titulo = 'Excelente precisión.';
@@ -411,6 +514,7 @@ document.addEventListener('DOMContentLoaded', () => {
     finalActions.innerHTML = '';
 
     const btn = document.createElement('button');
+    btn.type = 'button';
     btn.className = 'btn principal';
 
     if (pct >= 90) {
@@ -430,17 +534,35 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const linkOtroJuego = document.createElement('a');
     linkOtroJuego.href = 'https://falltem.org/juegos/#games-cards';
-    linkOtroJuego.className = 'btn secundario';
     linkOtroJuego.target = '_blank';
     linkOtroJuego.rel = 'noopener noreferrer';
+    linkOtroJuego.className = 'btn secundario';
     linkOtroJuego.textContent = 'Elegir otro juego';
     finalActions.appendChild(linkOtroJuego);
 
+    const linkConfig = document.createElement('button');
+    linkConfig.type = 'button';
+    linkConfig.className = 'btn texto';
+    linkConfig.textContent = '⚙️ Elegir otra configuración';
+    linkConfig.addEventListener('click', () => {
+      btnReiniciar.click();
+    });
+    finalActions.appendChild(linkConfig);
+
     finalActions.hidden = false;
+    btn.focus();
   }
 
   function finalizarSesion() {
-    const tiempoPromedio = (rondasTotales > 0)
+    stopTimer();
+    hideTimer();
+    setTxt(timerText, '');
+    if (timerFill) {
+      timerFill.style.width = '0%';
+      timerFill.dataset.level = 'normal';
+    }
+
+    const tiempoPromedio = rondasTotales > 0
       ? Math.round(totalTiempoAcumuladoMs / rondasTotales)
       : null;
 
@@ -450,39 +572,50 @@ document.addEventListener('DOMContentLoaded', () => {
       tiempoPromedioMs: tiempoPromedio
     });
 
-    const pct = Math.round((aciertos / Math.max(1, rondasTotales)) * 100);
+    const pct = rondasTotales > 0
+      ? Math.round((aciertos / rondasTotales) * 100)
+      : 0;
 
     setTxt(enunciado, 'Sesión finalizada');
     setTxt(feedback, texto);
-    feedback.className = (pct >= 70)
+    feedback.className = pct >= 70
       ? 'feedback ok'
-      : (pct >= 50 ? 'feedback muted' : 'feedback bad');
+      : pct >= 50
+        ? 'feedback muted'
+        : 'feedback bad';
 
     renderFinalActions(pct);
 
     btnReiniciar.hidden = false;
-    btnComenzar.hidden  = true;
+    btnComenzar.hidden = true;
 
-    hideTimer();
+    if (btnPause) {
+      btnPause.hidden = true;
+    }
+    paused = false;
 
-    if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
+    if (keyHandlerRef) {
+      document.removeEventListener('keydown', keyHandlerRef);
+      keyHandlerRef = null;
+    }
   }
 
   function cambiarDificultad(delta) {
-    const orden = ['facil','medio','avanzado'];
+    const orden = ['facil', 'medio', 'avanzado'];
     let idx = orden.indexOf(dificultad);
     idx = Math.max(0, Math.min(orden.length - 1, idx + delta));
-    difSel.value = orden[idx];
+    dificultad = orden[idx];
+    difSel.value = dificultad;
     btnComenzar.click();
   }
 
   // ============================
   // EVENTOS PRINCIPALES
   // ============================
-  btnComenzar.addEventListener('click', () => {
-    operacion     = opSel.value;
-    dificultad    = difSel.value;
-    rondasTotales = Number(ronSel.value);
+  btnComenzar?.addEventListener('click', () => {
+    operacion  = opSel.value;
+    dificultad = difSel.value;
+    rondasTotales = Number(ronSel.value || 8) || 8;
 
     try {
       localStorage.setItem('calc_op', operacion);
@@ -490,64 +623,94 @@ document.addEventListener('DOMContentLoaded', () => {
       localStorage.setItem('calc_rondas', String(rondasTotales));
     } catch {}
 
-    rondaActual = 0;
-    aciertos = 0;
+    rondaActual   = 0;
+    aciertos      = 0;
     totalTiempoAcumuladoMs = 0;
 
-    btnComenzar.hidden  = true;
+    btnComenzar.hidden = true;
     btnReiniciar.hidden = true;
-    finalActions.hidden = true;
+
+    setTxt(timerText, '');
+    if (timerFill) {
+      timerFill.style.width = '0%';
+      timerFill.dataset.level = 'normal';
+    }
 
     nuevaPregunta();
-
-    const juego = document.getElementById('juego');
-    if (juego) juego.scrollIntoView({ behavior: 'smooth', block: 'center' });
   });
 
-  btnReiniciar.addEventListener('click', () => {
+  btnReiniciar?.addEventListener('click', () => {
     stopTimer();
-    btnComenzar.hidden  = false;
-    btnReiniciar.hidden = true;
-    finalActions.hidden = true;
+    hideTimer();
+    setTxt(timerText, '');
 
-    rondaActual = 0;
-    aciertos    = 0;
-    totalTiempoAcumuladoMs = 0;
+    btnComenzar.hidden = false;
+    btnReiniciar.hidden = true;
 
     setTxt(enunciado, 'Presioná “Comenzar” para iniciar.');
     setTxt(feedback, '');
     feedback.className = 'feedback muted';
-    opcionesEl.innerHTML = '';
+
+    if (opcionesEl) opcionesEl.innerHTML = '';
+
+    rondaActual   = 0;
+    aciertos      = 0;
+    totalTiempoAcumuladoMs = 0;
+
+    if (timerFill) {
+      timerFill.style.width = '0%';
+      timerFill.dataset.level = 'normal';
+    }
+
+    finalActions.hidden = true;
+
+    if (btnPause) btnPause.hidden = true;
+    paused = false;
+
+    if (keyHandlerRef) {
+      document.removeEventListener('keydown', keyHandlerRef);
+      keyHandlerRef = null;
+    }
 
     actualizarProgreso();
-    hideTimer();
-
-    if (keyHandlerRef) document.removeEventListener('keydown', keyHandlerRef);
   });
 
   // ============================
-  // ESTADO INICIAL (localStorage)
+  // RESTAURAR PREFERENCIAS
   // ============================
   try {
     const opLS   = localStorage.getItem('calc_op');
     const diffLS = localStorage.getItem('calc_diff');
     const ronLS  = localStorage.getItem('calc_rondas');
-    if (opLS   && opSel.querySelector(`option[value="${opLS}"]`))   { opSel.value  = opLS;   operacion   = opLS; }
-    if (diffLS && difSel.querySelector(`option[value="${diffLS}"]`)){ difSel.value = diffLS; dificultad = diffLS; }
-    if (ronLS  && ronSel.querySelector(`option[value="${ronLS}"]`)){ ronSel.value = ronLS;  rondasTotales = Number(ronLS); }
+
+    if (opLS && opSel.querySelector(`option[value="${opLS}"]`)) {
+      opSel.value = opLS;
+      operacion = opLS;
+    }
+    if (diffLS && difSel.querySelector(`option[value="${diffLS}"]`)) {
+      difSel.value = diffLS;
+      dificultad = diffLS;
+    }
+    if (ronLS && ronSel.querySelector(`option[value="${ronLS}"]`)) {
+      ronSel.value = ronLS;
+      rondasTotales = Number(ronLS);
+    }
   } catch {}
 
   actualizarProgreso();
   hideTimer();
 
   // ============================
-  // MODAL AYUDA
+  // MODAL DE AYUDA
   // ============================
   function openAbout() {
     if (!aboutModal) return;
     aboutModal.hidden = false;
     aboutModal.setAttribute('aria-hidden', 'false');
     aboutBtn?.setAttribute('aria-expanded', 'true');
+    // Siempre arrancamos en la pestaña "¿Por qué este juego?"
+    activarTab('porques');
+    aboutClose?.focus();
   }
 
   function closeAbout() {
@@ -571,4 +734,28 @@ document.addEventListener('DOMContentLoaded', () => {
       closeAbout();
     }
   });
+
+  // ============================
+  // TABS DEL MODAL
+  // ============================
+  function activarTab(tab) {
+    if (!tabPorques || !tabComo || !contentPorques || !contentComo) return;
+
+    if (tab === 'porques') {
+      contentPorques.hidden = false;
+      contentComo.hidden = true;
+
+      tabPorques.classList.add('tab-btn--active');
+      tabComo.classList.remove('tab-btn--active');
+    } else {
+      contentPorques.hidden = true;
+      contentComo.hidden = false;
+
+      tabComo.classList.add('tab-btn--active');
+      tabPorques.classList.remove('tab-btn--active');
+    }
+  }
+
+  tabPorques?.addEventListener('click', () => activarTab('porques'));
+  tabComo?.addEventListener('click', () => activarTab('como'));
 });
