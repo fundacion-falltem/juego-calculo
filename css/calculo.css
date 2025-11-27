@@ -1,0 +1,460 @@
+/* ======================================================
+   FALLTEM — Cálculo amable
+   Estilos específicos del juego
+   Tokens y base en /css/falltem-tokens.css
+   ====================================================== */
+
+/* ======================================================
+   Botón de ayuda flotante (afinado visual)
+   ====================================================== */
+
+.btn-ayuda {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  color: #111827;
+  font-weight: 900;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, .18);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, .35);
+}
+.btn-ayuda:hover {
+  background: #e5f4ff;
+}
+.btn-ayuda:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* ======================================================
+   Tarjeta principal (card)
+   ====================================================== */
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, .06);
+}
+
+/* ======================================================
+   Controles (operación / rondas / dificultad / botones)
+   ====================================================== */
+
+.controles {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .9rem 1rem;
+  align-items: flex-end;
+  margin-bottom: calc(var(--space) * 1.1);
+}
+
+.control label {
+  display: block;
+  font-weight: 900;
+  margin-bottom: .35rem;
+}
+
+/* Hint bajo los selects */
+.control__hint {
+  margin: .35rem 0 0;
+  font-size: .82rem;
+  color: var(--muted);
+}
+
+/* Selects genéricos (solo aplica a los que no tienen Tailwind sobreecribiendo todo) */
+select {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background: var(--card);
+  color: var(--fg);
+  border: 1px solid var(--border);
+  border-radius: .9rem;
+  padding: .85rem 1rem;
+  width: 100%;
+  font-size: 1.05rem;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='currentColor' xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20'><path d='M5 7l5 5 5-5H5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right .85rem center;
+  background-size: 1rem 1rem;
+}
+select:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Botonera de controles */
+.control.buttons {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.control.buttons .btn {
+  width: 100%;
+  min-width: 0;
+  padding-block: .95rem;
+  border-radius: 999px;
+}
+
+/* Pequeño ajuste exclusivo para el select de rondas */
+.control--rondas select {
+  margin-bottom: 2px;
+}
+
+/* Layout responsive de controles (4 columnas) */
+@media (min-width: 720px) {
+  .controles {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+/* ======================================================
+   Botones genéricos
+   ====================================================== */
+
+.btn {
+  border: 0;
+  border-radius: 14px;
+  cursor: pointer;
+  font-weight: 900;
+  padding: .85rem 1.15rem;
+  min-height: 46px;
+  font-size: 1.02rem;
+  transition:
+    transform .08s ease,
+    filter .15s ease,
+    box-shadow .15s ease,
+    background-color .15s ease,
+    color .15s ease;
+}
+.btn:hover {
+  filter: brightness(1.05);
+  transform: translateY(-1px);
+}
+.btn:active {
+  transform: translateY(0);
+}
+.btn:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.btn.principal {
+  background: var(--btn-primary-bg);
+  color: var(--btn-primary-fg);
+}
+.btn.secundario {
+  background: var(--btn-sec-bg);
+  color: var(--btn-sec-fg);
+}
+.btn.texto {
+  background: transparent;
+  color: var(--muted);
+  padding-inline: 0;
+  font-weight: 700;
+}
+
+/* Foco claro en el botón principal inicial */
+#btnComenzar:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+/* ======================================================
+   Juego / Enunciado
+   ====================================================== */
+
+.juego {
+  margin-top: .5rem;
+}
+
+.enunciado {
+  font-size: clamp(2rem, 2.2vw + 1.2rem, 3rem);
+  font-weight: 900;
+  text-align: center;
+  letter-spacing: 0;
+  margin: .4rem 0 1.1rem;
+}
+
+/* Tamaño sutil exclusivo para el mensaje inicial */
+.enunciado--inicio {
+  font-size: 1.1rem !important;   /* ~ la mitad del título */
+  font-weight: 600 !important;
+  opacity: .85;
+  margin-top: .5rem;
+}
+
+/* ======================================================
+   Opciones de respuesta
+   ====================================================== */
+
+.opciones {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: .8rem;
+}
+
+@media (min-width: 640px) {
+  .opciones {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+.opcion-btn {
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  background: var(--card);
+  color: var(--fg);
+  border: 2px solid var(--border);
+  border-radius: 14px;
+  padding: 1rem 1.1rem;
+  font-weight: 800;
+  font-size: clamp(1.05rem, .6vw + 1rem, 1.25rem);
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, .08);
+  transition:
+    transform .12s ease,
+    filter .15s ease,
+    border-color .15s ease,
+    box-shadow .15s ease,
+    background-color .15s ease;
+}
+.opcion-btn:hover {
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+}
+.opcion-btn[aria-disabled="true"] {
+  cursor: default;
+  opacity: .85;
+}
+.opcion-btn:focus-visible {
+  outline: none;
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--focus) 45%, transparent);
+}
+.opcion-btn.is-selected {
+  border-color: var(--focus);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--focus) 35%, transparent);
+  background: color-mix(in oklab, var(--focus) 10%, var(--card));
+}
+.opcion-btn.ok {
+  border-color: var(--ok);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--ok) 35%, transparent);
+  background: color-mix(in oklab, var(--ok) 12%, var(--card));
+}
+.opcion-btn.bad {
+  border-color: var(--bad);
+  box-shadow: 0 0 0 3px color-mix(in oklab, var(--bad) 35%, transparent);
+  background: color-mix(in oklab, var(--bad) 8%, var(--card));
+}
+
+/* ======================================================
+   Feedback / Acciones finales
+   ====================================================== */
+
+.feedback {
+  margin-top: .8rem;
+  text-align: center;
+  min-height: 1.4em;
+}
+.feedback.muted {
+  color: var(--muted);
+}
+
+.final-actions {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+  align-items: center;
+}
+
+/* ======================================================
+   Timer (solo estados especiales y animación)
+   ====================================================== */
+
+.timer-alert {
+  color: var(--bad);
+  font-weight: 900;
+}
+
+#timerFill[data-level="warn"] {
+  background: #f59e0b;
+}
+#timerFill[data-level="alert"] {
+  background: var(--bad);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .timer-pulse {
+    animation: pulse .8s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%   { transform: scale(1); }
+    50%  { transform: scale(1.06); }
+    100% { transform: scale(1); }
+  }
+}
+
+/* ======================================================
+   Footer
+   ====================================================== */
+
+.page-footer {
+  margin-top: 1.2rem;
+  font-size: .8rem;
+  color: var(--muted);
+  text-align: center;
+}
+.page-footer a {
+  color: inherit;
+  font-weight: 700;
+}
+
+/* ======================================================
+   Accesibilidad
+   ====================================================== */
+
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0,0,0,0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* Forzar que el modal se oculte cuando tiene el atributo hidden */
+#aboutModal[hidden] {
+  display: none !important;
+}
+
+/* ======================================================
+   Modal de ayuda (2 solapas)
+   ====================================================== */
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  z-index: 50;
+}
+
+.modal-card {
+  background: var(--card);
+  color: var(--fg);
+  border-radius: 16px;
+  padding: 1.5rem 1.75rem;
+  max-width: 640px;
+  width: 100%;
+  border: 1px solid var(--border);
+  box-shadow: 0 20px 40px rgba(15, 23, 42, .32);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+.modal-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.modal-close {
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-size: 1.2rem;
+  color: var(--muted);
+}
+.modal-close:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Tabs del modal */
+.modal-tabs {
+  display: flex;
+  gap: 1rem;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: 1rem;
+}
+.tab-btn {
+  border: 0;
+  background: transparent;
+  padding: 0 0 .5rem;
+  font-weight: 700;
+  font-size: .95rem;
+  cursor: pointer;
+  color: var(--muted);
+  border-bottom: 2px solid transparent;
+}
+.tab-btn--active {
+  color: var(--fg);
+  border-bottom-color: var(--btn-primary-bg);
+}
+
+/* Contenido modal */
+.modal-text {
+  margin: 0 0 .75rem;
+  font-size: .95rem;
+  color: var(--fg);
+}
+.modal-list {
+  margin: 0 0 .75rem;
+  padding-left: 1.2rem;
+  font-size: .92rem;
+  color: var(--fg);
+}
+.modal-list--ordered {
+  list-style: decimal;
+}
+.modal-note {
+  margin: 0 0 .35rem;
+  font-size: .78rem;
+  color: var(--muted);
+}
+.modal-version {
+  margin: 0 0 .5rem;
+  font-size: .78rem;
+  color: var(--muted);
+}
+.modal-actions {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* ======================================================
+   Responsive fino
+   ====================================================== */
+
+@media (max-width: 640px) {
+  .enunciado {
+    font-size: 1.75rem;
+  }
+  .opcion-btn {
+    font-size: 1rem;
+    padding: .85rem 1rem;
+  }
+}

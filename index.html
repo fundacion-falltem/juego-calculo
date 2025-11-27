@@ -13,11 +13,14 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Estilos propios (marca, modal, etc.) -->
-  <link rel="stylesheet" href="styles.css?v=1.0.0" />
-
-  <!-- Tailwind CDN -->
+  <!-- Tailwind CDN (utilidades) -->
   <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- Tokens compartidos FALLTEM (tema, botones, modales base) -->
+  <link rel="stylesheet" href="css/falltem-tokens.css">
+
+  <!-- Estilos específicos del juego Cálculo amable -->
+  <link rel="stylesheet" href="css/calculo.css">
 
   <!-- Cloudflare Web Analytics -->
   <script defer
@@ -139,7 +142,7 @@
           <h2 class="sr-only">Juego de operaciones</h2>
 
           <p id="enunciado"
-            class="enunciado enunciado--inicio text-center text-slate-700 leading-snug">
+             class="enunciado enunciado--inicio text-center text-slate-700 leading-snug">
             Presioná “Comenzar” para iniciar.
           </p>
 
@@ -191,101 +194,98 @@
           <div id="sr-updates" class="sr-only" aria-live="polite"></div>
         </section>
 
-       <!-- Footer -->
-          <footer class="page-footer py-4 text-center text-[11px] sm:text-xs text-slate-400">
-            Desarrollado por
-            <a href="https://falltem.org/" target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-slate-700">
-              FALLTEM
-            </a>
-            · Código abierto MIT · Actividad lúdica; estos juegos no constituyen práctica médica.
-          </footer>
-        </div>
+        <!-- Footer -->
+        <footer class="page-footer py-4 text-center text-[11px] sm:text-xs text-slate-400">
+          Desarrollado por
+          <a href="https://falltem.org/" target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-slate-700">
+            FALLTEM
+          </a>
+          · Código abierto MIT · Actividad lúdica; estos juegos no constituyen práctica médica.
+        </footer>
       </section>
     </main>
 
-    
+    <!-- Modal de ayuda con 2 solapas -->
+    <div id="aboutModal"
+         class="modal-backdrop"
+         role="dialog"
+         aria-modal="true"
+         aria-labelledby="aboutTitle"
+         hidden>
+      <div class="modal-card bg-white rounded-2xl shadow-2xl p-5 sm:p-6 md:p-7 border border-slate-200">
+        <header class="modal-header flex items-center justify-between gap-3 mb-3 sm:mb-4">
+          <h2 id="aboutTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">Cálculo amable</h2>
+          <button id="aboutCloseX"
+                  class="modal-close text-slate-400 hover:text-slate-600 text-lg"
+                  type="button"
+                  aria-label="Cerrar explicación">
+            ✕
+          </button>
+        </header>
 
-  <!-- Modal de ayuda con 2 solapas -->
-  <div id="aboutModal"
-       class="modal-backdrop"
-       role="dialog"
-       aria-modal="true"
-       aria-labelledby="aboutTitle"
-       hidden>
-    <div class="modal-card bg-white rounded-2xl shadow-2xl p-5 sm:p-6 md:p-7 border border-slate-200">
-      <header class="modal-header flex items-center justify-between gap-3 mb-3 sm:mb-4">
-        <h2 id="aboutTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">Cálculo amable</h2>
-        <button id="aboutCloseX"
-                class="modal-close text-slate-400 hover:text-slate-600 text-lg"
-                type="button"
-                aria-label="Cerrar explicación">
-          ✕
-        </button>
-      </header>
+        <!-- Tabs -->
+        <div class="modal-tabs flex gap-4 border-b border-slate-200 mb-4">
+          <button id="tab-porques"
+                  class="tab-btn tab-btn--active pb-2 text-sm sm:text-base font-semibold border-b-2 border-lime-400 text-slate-900"
+                  type="button">
+            ¿Por qué este juego?
+          </button>
+          <button id="tab-como"
+                  class="tab-btn pb-2 text-sm sm:text-base font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700"
+                  type="button">
+            ¿Cómo se juega?
+          </button>
+        </div>
 
-      <!-- Tabs -->
-      <div class="modal-tabs flex gap-4 border-b border-slate-200 mb-4">
-        <button id="tab-porques"
-                class="tab-btn tab-btn--active pb-2 text-sm sm:text-base font-semibold border-b-2 border-lime-400 text-slate-900"
-                type="button">
-          ¿Por qué este juego?
-        </button>
-        <button id="tab-como"
-                class="tab-btn pb-2 text-sm sm:text-base font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700"
-                type="button">
-          ¿Cómo se juega?
-        </button>
-      </div>
+        <!-- Contenido: ¿Cómo se juega? -->
+        <section id="content-como" class="space-y-3" hidden>
+          <p class="modal-text text-sm sm:text-base text-slate-700">
+            El objetivo es resolver operaciones sencillas y elegir la respuesta correcta
+            entre cuatro opciones. Cada ronda tiene un tiempo aproximado, pero podés jugar
+            con tranquilidad.
+          </p>
 
-      <!-- Contenido: ¿Cómo se juega? -->
-      <section id="content-como" class="space-y-3" hidden>
-        <p class="modal-text text-sm sm:text-base text-slate-700">
-          El objetivo es resolver operaciones sencillas y elegir la respuesta correcta
-          entre cuatro opciones. Cada ronda tiene un tiempo aproximado, pero podés jugar
-          con tranquilidad.
-        </p>
+          <ol class="modal-list modal-list--ordered list-decimal list-inside text-sm sm:text-base text-slate-700 space-y-1">
+            <li>Elegí la <strong>operación</strong>, la <strong>dificultad</strong> y la cantidad de <strong>rondas</strong>.</li>
+            <li>Presioná el botón <strong>“Comenzar”</strong>.</li>
+            <li>Leé la operación (por ejemplo: <em>7 + 5 = ?</em>).</li>
+            <li>Seleccioná una de las 4 respuestas. Podés usar el mouse o el teclado (A–D o 1–4).</li>
+            <li>Si el tiempo se termina, se muestra la respuesta correcta y pasás a la siguiente.</li>
+            <li>Al finalizar, vas a ver tu resultado y una recomendación para seguir practicando.</li>
+          </ol>
 
-        <ol class="modal-list modal-list--ordered list-decimal list-inside text-sm sm:text-base text-slate-700 space-y-1">
-          <li>Elegí la <strong>operación</strong>, la <strong>dificultad</strong> y la cantidad de <strong>rondas</strong>.</li>
-          <li>Presioná el botón <strong>“Comenzar”</strong>.</li>
-          <li>Leé la operación (por ejemplo: <em>7 + 5 = ?</em>).</li>
-          <li>Seleccioná una de las 4 respuestas. Podés usar el mouse o el teclado (A–D o 1–4).</li>
-          <li>Si el tiempo se termina, se muestra la respuesta correcta y pasás a la siguiente.</li>
-          <li>Al finalizar, vas a ver tu resultado y una recomendación para seguir practicando.</li>
-        </ol>
+          <p class="modal-note text-[11px] text-slate-500">
+            Consejo: si sentís que te cuesta, probá con <strong>menos rondas</strong> o una
+            <strong>dificultad más fácil</strong>. Siempre podés volver a intentarlo.
+          </p>
+        </section>
+        
+        <!-- Contenido: ¿Por qué este juego? -->
+        <section id="content-porques" class="space-y-3">
+          <p class="modal-text text-sm sm:text-base text-slate-700">
+            Este ejercicio estimula <strong>cálculo básico</strong>, 
+            <strong>atención</strong> y <strong>velocidad de procesamiento</strong>, 
+            habilidades importantes para mantener la mente activa 
+            (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4055506/" target="_blank" rel="noopener noreferrer">Kable et al., 2014</a>).
+            Podés jugar sin límite de sesiones, siempre a tu ritmo.
+          </p>
 
-        <p class="modal-note text-[11px] text-slate-500">
-          Consejo: si sentís que te cuesta, probá con <strong>menos rondas</strong> o una
-          <strong>dificultad más fácil</strong>. Siempre podés volver a intentarlo.
-        </p>
-      </section>
-      
-      <!-- Contenido: ¿Por qué este juego? -->
-      <section id="content-porques" class="space-y-3">
-        <p class="modal-text text-sm sm:text-base text-slate-700">
-          Este ejercicio estimula <strong>cálculo básico</strong>, 
-        <strong>atención</strong> y <strong>velocidad de procesamiento</strong>, 
-        habilidades importantes para mantener la mente activa 
-        (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4055506/" target="_blank" rel="noopener noreferrer">Kable et al., 2014</a>).
-        Podés jugar sin límite de sesiones, siempre a tu ritmo.
-        </p>
+          <p class="modal-note text-[11px] text-slate-500">
+            ℹ️ <strong>Actividad lúdica:</strong> no es práctica médica. No recolectamos datos personales.
+          </p>
 
-        <p class="modal-note text-[11px] text-slate-500">
-          ℹ️ <strong>Actividad lúdica:</strong> no es práctica médica. No recolectamos datos personales.
-        </p>
+          <p class="modal-version text-[11px] text-slate-400">
+            <small id="versionLabel"></small>
+          </p>
+        </section>
 
-        <p class="modal-version text-[11px] text-slate-400">
-          <small id="versionLabel"></small>
-        </p>
-      </section>
-
-
-      <div class="modal-actions mt-5 flex justify-end">
-        <button id="aboutClose"
-                class="btn principal inline-flex items-center justify-center rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-bold text-sm sm:text-base py-2.5 px-5 shadow-md transition"
-                type="button">
-          Entendido
-        </button>
+        <div class="modal-actions mt-5 flex justify-end">
+          <button id="aboutClose"
+                  class="btn principal inline-flex items-center justify-center rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-bold text-sm sm:text-base py-2.5 px-5 shadow-md transition"
+                  type="button">
+            Entendido
+          </button>
+        </div>
       </div>
     </div>
   </div>
