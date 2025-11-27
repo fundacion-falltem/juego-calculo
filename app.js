@@ -5,6 +5,9 @@ document.addEventListener('DOMContentLoaded', () => {
   const versionEl = document.getElementById('versionLabel');
   if (versionEl) versionEl.textContent = VERSION;
 
+  // Helper para selects tipo jQuery
+  const $ = (sel) => document.querySelector(sel);
+
   // ============================
   // REFERENCIAS
   // ============================
@@ -33,16 +36,15 @@ document.addEventListener('DOMContentLoaded', () => {
   const srUpdates = document.getElementById('sr-updates');
 
   // Modal ayuda
-  const aboutBtn    = document.getElementById('aboutBtn');
-  const aboutModal  = document.getElementById('aboutModal');
-  const aboutClose  = document.getElementById('aboutClose');
-  const aboutCloseX = document.getElementById('aboutCloseX');
+  const aboutBtn = $("#aboutBtn");
+  const aboutModal = $("#aboutModal");
+  const aboutClose = $("#aboutClose");
+  const aboutCloseX = $("#aboutCloseX");
 
-  // Tabs del modal
-  const tabPorques      = document.getElementById('tab-porques');
-  const tabComo         = document.getElementById('tab-como');
-  const contentPorques  = document.getElementById('content-porques');
-  const contentComo     = document.getElementById('content-como');
+  const tabComo = $("#tab-como");
+  const tabPorques = $("#tab-porques");
+  const contentComo = $("#content-como");
+  const contentPorques = $("#content-porques");
 
   // ============================
   // ESTADO
