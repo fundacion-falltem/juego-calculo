@@ -294,6 +294,7 @@ select:focus-visible {
   background: color-mix(in oklab, var(--border) 40%, transparent);
 }
 
+
 /* Enlaces con apariencia de botón */
 a.btn,
 a.btn:link,

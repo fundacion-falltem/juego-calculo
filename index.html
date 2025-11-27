@@ -13,13 +13,13 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;800;900&display=swap" rel="stylesheet">
 
-  <!-- Tailwind CDN (utilidades) -->
+  <!-- Tailwind CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
 
-  <!-- Tokens compartidos FALLTEM (tema, botones, modales base) -->
+  <!-- Tokens compartidos -->
   <link rel="stylesheet" href="css/falltem-tokens.css">
 
-  <!-- Estilos específicos del juego Cálculo amable -->
+  <!-- Estilos propios del juego -->
   <link rel="stylesheet" href="css/calculo.css">
 
   <!-- Cloudflare Web Analytics -->
@@ -30,11 +30,13 @@
 
   <meta name="referrer" content="strict-origin-when-cross-origin" />
 </head>
+
 <body class="bg-slate-100 text-slate-900">
-  <!-- Enlace para lectores de pantalla / teclado -->
+
+  <!-- Skip link -->
   <a href="#juego" class="skip-link">Saltar directamente al juego</a>
 
-  <!-- Botón de ayuda fijo arriba a la derecha -->
+  <!-- Botón de ayuda -->
   <div class="fixed top-5 right-5 z-40">
     <button id="aboutBtn"
             class="btn-ayuda inline-flex items-center justify-center w-10 h-10 rounded-full border border-slate-200 bg-white text-slate-800 text-base font-extrabold shadow-md hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-400"
@@ -42,17 +44,15 @@
             aria-haspopup="dialog"
             aria-controls="aboutModal"
             aria-expanded="false"
-            aria-label="Ver explicación del juego">
-      ?
-    </button>
+            aria-label="Ver explicación del juego">?</button>
   </div>
 
-  <!-- Contenedor principal -->
   <div class="min-h-screen flex flex-col">
     <main id="juego" role="main" aria-labelledby="titulo" class="flex-1 flex items-start justify-center px-4 py-10 md:py-12">
-      <!-- Tarjeta principal del juego -->
+
       <section class="card w-full max-w-4xl bg-white rounded-[32px] shadow-xl px-6 sm:px-10 py-8 sm:py-10">
-        <!-- Header dentro de la tarjeta -->
+
+        <!-- Header -->
         <header class="header border-b border-slate-100 pb-6 mb-6" aria-describedby="intro">
           <p class="eyebrow text-xs font-extrabold tracking-[0.25em] text-lime-700 uppercase mb-2">
             Juegos Cognitivos FALLTEM
@@ -68,6 +68,7 @@
 
         <!-- Controles -->
         <div class="controles grid gap-5 md:grid-cols-3 md:items-start md:gap-6 mb-8" role="group" aria-label="Opciones del juego">
+
           <!-- Operación -->
           <div class="control space-y-2">
             <label for="operacion" class="block text-sm font-extrabold text-slate-900">Operación</label>
@@ -115,29 +116,34 @@
             </p>
           </div>
 
-          <!-- Botones acción -->
+          <!-- Botones -->
           <div class="control buttons md:col-span-3 mt-1 flex flex-col gap-3">
+
             <button id="btnComenzar"
                     type="button"
                     class="btn principal w-full rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-extrabold py-3 text-lg shadow-md transition">
               Comenzar
             </button>
+
             <button id="btnReiniciar"
                     type="button"
                     hidden
                     class="btn secundario w-full rounded-full bg-slate-900 hover:bg-slate-800 text-slate-50 font-bold py-3 text-base shadow-md transition">
               Volver a jugar
             </button>
+
             <button id="btnPause"
                     type="button"
                     hidden
                     class="btn texto self-start text-sm text-slate-500 hover:text-slate-700 underline-offset-4 hover:underline">
               Pausar
             </button>
+
           </div>
+
         </div>
 
-        <!-- Juego / Enunciado -->
+        <!-- Juego -->
         <section class="juego" aria-label="Juego de cálculo">
           <h2 class="sr-only">Juego de operaciones</h2>
 
@@ -154,17 +160,13 @@
           <div id="opciones"
                class="opciones mt-6 grid gap-3 sm:grid-cols-2"
                role="group"
-               aria-label="Opciones de respuesta">
-            <!-- Botones de respuesta generados por JS -->
-          </div>
+               aria-label="Opciones de respuesta"></div>
 
           <!-- Progreso -->
           <div class="progreso mt-6" aria-label="Progreso de la sesión">
             <div class="progreso-header flex items-center justify-between text-xs sm:text-sm text-slate-500 mb-2">
               <span id="progTxt">0/0</span>
-              <span class="aciertos">
-                Aciertos: <strong id="aciertos" class="font-bold">0</strong>
-              </span>
+              <span class="aciertos">Aciertos: <strong id="aciertos" class="font-bold">0</strong></span>
             </div>
             <div class="progreso-bar h-2 rounded-full bg-slate-200 overflow-hidden">
               <div id="pbFill" class="h-full w-0 bg-lime-400 transition-[width] duration-300 ease-out"></div>
@@ -174,123 +176,103 @@
           <!-- Timer -->
           <div class="timer mt-5" aria-live="off">
             <p id="timerText"
-               class="timer-text text-center text-sm font-semibold text-slate-700"
-               aria-hidden="true"></p>
-            <div class="timerBar h-3 rounded-full bg-slate-200 overflow-hidden mt-1"
-                 aria-hidden="true">
+               class="timer-text text-center text-sm font-semibold text-slate-700"></p>
+            <div class="timerBar h-3 rounded-full bg-slate-200 overflow-hidden mt-1">
               <div id="timerFill"
                    data-level="normal"
-                   class="h-full w-0 bg-slate-800 transition-[width] duration-100 ease-linear">
-              </div>
+                   class="h-full w-0 bg-slate-800 transition-[width] duration-100 ease-linear"></div>
             </div>
           </div>
 
           <!-- Acciones finales -->
           <div id="finalActions"
                class="final-actions mt-6 flex flex-col gap-3 items-stretch sm:items-center"
-               hidden></div>
+               hidden>
+               
+            <button id="btnOtroJuego"
+                    type="button"
+                    class="btn principal w-full rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-extrabold py-3 text-base shadow-md transition"
+                    hidden>
+              Elegir otro juego
+            </button>
 
-          <!-- Región para lector de pantalla -->
+          </div>
+
           <div id="sr-updates" class="sr-only" aria-live="polite"></div>
         </section>
 
         <!-- Footer -->
         <footer class="page-footer py-4 text-center text-[11px] sm:text-xs text-slate-400">
-          Desarrollado por
-          <a href="https://falltem.org/" target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-slate-700">
-            FALLTEM
-          </a>
+          Desarrollado por <a href="https://falltem.org/" target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-slate-700">FALLTEM</a>
           · Código abierto MIT · Actividad lúdica; estos juegos no constituyen práctica médica.
         </footer>
       </section>
     </main>
 
-    <!-- Modal de ayuda con 2 solapas -->
+    <!-- Modal -->
     <div id="aboutModal"
          class="modal-backdrop"
          role="dialog"
          aria-modal="true"
          aria-labelledby="aboutTitle"
          hidden>
+
       <div class="modal-card bg-white rounded-2xl shadow-2xl p-5 sm:p-6 md:p-7 border border-slate-200">
-        <header class="modal-header flex items-center justify-between gap-3 mb-3 sm:mb-4">
+
+        <header class="modal-header">
           <h2 id="aboutTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">Cálculo amable</h2>
           <button id="aboutCloseX"
                   class="modal-close text-slate-400 hover:text-slate-600 text-lg"
                   type="button"
-                  aria-label="Cerrar explicación">
-            ✕
-          </button>
+                  aria-label="Cerrar explicación">✕</button>
         </header>
 
-        <!-- Tabs -->
-        <div class="modal-tabs flex gap-4 border-b border-slate-200 mb-4">
+        <div class="modal-tabs">
           <button id="tab-porques"
                   class="tab-btn tab-btn--active pb-2 text-sm sm:text-base font-semibold border-b-2 border-lime-400 text-slate-900"
-                  type="button">
-            ¿Por qué este juego?
-          </button>
+                  type="button">¿Por qué este juego?</button>
           <button id="tab-como"
                   class="tab-btn pb-2 text-sm sm:text-base font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700"
-                  type="button">
-            ¿Cómo se juega?
-          </button>
+                  type="button">¿Cómo se juega?</button>
         </div>
 
-        <!-- Contenido: ¿Cómo se juega? -->
-        <section id="content-como" class="space-y-3" hidden>
-          <p class="modal-text text-sm sm:text-base text-slate-700">
-            El objetivo es resolver operaciones sencillas y elegir la respuesta correcta
-            entre cuatro opciones. Cada ronda tiene un tiempo aproximado, pero podés jugar
-            con tranquilidad.
-          </p>
+        <!-- ¿Cómo se juega? -->
+        <section id="content-como" hidden class="space-y-3">
+          <p class="modal-text">El objetivo es resolver operaciones sencillas y elegir la respuesta correcta...</p>
 
-          <ol class="modal-list modal-list--ordered list-decimal list-inside text-sm sm:text-base text-slate-700 space-y-1">
-            <li>Elegí la <strong>operación</strong>, la <strong>dificultad</strong> y la cantidad de <strong>rondas</strong>.</li>
-            <li>Presioná el botón <strong>“Comenzar”</strong>.</li>
-            <li>Leé la operación (por ejemplo: <em>7 + 5 = ?</em>).</li>
-            <li>Seleccioná una de las 4 respuestas. Podés usar el mouse o el teclado (A–D o 1–4).</li>
-            <li>Si el tiempo se termina, se muestra la respuesta correcta y pasás a la siguiente.</li>
-            <li>Al finalizar, vas a ver tu resultado y una recomendación para seguir practicando.</li>
+          <ol class="modal-list modal-list--ordered">
+            <li>Elegí la operación, la dificultad y la cantidad de rondas.</li>
+            <li>Presioná el botón “Comenzar”.</li>
+            <li>Leé la operación.</li>
+            <li>Seleccioná una de las 4 respuestas.</li>
+            <li>Si se termina el tiempo, pasás a la siguiente.</li>
+            <li>Al finalizar, verás tu resultado.</li>
           </ol>
 
-          <p class="modal-note text-[11px] text-slate-500">
-            Consejo: si sentís que te cuesta, probá con <strong>menos rondas</strong> o una
-            <strong>dificultad más fácil</strong>. Siempre podés volver a intentarlo.
-          </p>
+          <p class="modal-note">Consejo: si te cuesta, reducí rondas o dificultad…</p>
         </section>
-        
-        <!-- Contenido: ¿Por qué este juego? -->
+
+        <!-- ¿Por qué este juego? -->
         <section id="content-porques" class="space-y-3">
-          <p class="modal-text text-sm sm:text-base text-slate-700">
-            Este ejercicio estimula <strong>cálculo básico</strong>, 
-            <strong>atención</strong> y <strong>velocidad de procesamiento</strong>, 
-            habilidades importantes para mantener la mente activa 
-            (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4055506/" target="_blank" rel="noopener noreferrer">Kable et al., 2014</a>).
-            Podés jugar sin límite de sesiones, siempre a tu ritmo.
-          </p>
-
-          <p class="modal-note text-[11px] text-slate-500">
-            ℹ️ <strong>Actividad lúdica:</strong> no es práctica médica. No recolectamos datos personales.
-          </p>
-
-          <p class="modal-version text-[11px] text-slate-400">
-            <small id="versionLabel"></small>
-          </p>
+          <p class="modal-text">Este ejercicio estimula cálculo básico, atención y velocidad de procesamiento…</p>
+          <p class="modal-note">Actividad lúdica: no es práctica médica.</p>
+          <p class="modal-version"><small id="versionLabel"></small></p>
         </section>
 
-        <div class="modal-actions mt-5 flex justify-end">
+        <div class="modal-actions mt-5">
           <button id="aboutClose"
-                  class="btn principal inline-flex items-center justify-center rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-bold text-sm sm:text-base py-2.5 px-5 shadow-md transition"
+                  class="btn principal rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-bold py-2.5 px-6 text-sm shadow-md transition"
                   type="button">
             Entendido
           </button>
         </div>
+
       </div>
     </div>
   </div>
 
-  <!-- Lógica del juego -->
+  <!-- JS -->
   <script src="app.js?v=1.9.2" defer></script>
+
 </body>
 </html>
