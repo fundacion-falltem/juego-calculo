@@ -104,6 +104,12 @@ select:focus-visible {
   border-radius: 999px;
 }
 
+#btnOtroJuego {
+  background: var(--btn-primary-bg) !important;
+  color: var(--btn-primary-fg) !important;
+  border-color: var(--btn-primary-bg) !important;
+}
+
 /* Pequeño ajuste exclusivo para el select de rondas */
 .control--rondas select {
   margin-bottom: 2px;
