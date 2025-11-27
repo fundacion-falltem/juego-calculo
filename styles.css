@@ -608,9 +608,10 @@ select:focus-visible{
   margin-bottom:2px;
 }
 
-enunciado--inicio {
-  font-size: clamp(1rem, 0.6vw + 0.9rem, 1.35rem) !important;
+/* Tamaño sutil exclusivo para el mensaje inicial */
+.enunciado--inicio {
+  font-size: 1.1rem !important;   /* ~ la mitad del título */
   font-weight: 600 !important;
-  letter-spacing: 0;
   opacity: 0.85;
+  margin-top: 0.5rem;
 }
