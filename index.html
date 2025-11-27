@@ -17,10 +17,10 @@
   <script src="https://cdn.tailwindcss.com"></script>
 
   <!-- Tokens compartidos -->
-  <link rel="stylesheet" href="css/falltem-tokens.css">
+  <link rel="stylesheet" href="css/falltem-tokens.css" />
 
   <!-- Estilos propios del juego -->
-  <link rel="stylesheet" href="css/calculo.css">
+  <link rel="stylesheet" href="css/calculo.css" />
 
   <!-- Cloudflare Web Analytics -->
   <script defer
@@ -44,7 +44,9 @@
             aria-haspopup="dialog"
             aria-controls="aboutModal"
             aria-expanded="false"
-            aria-label="Ver explicación del juego">?</button>
+            aria-label="Ver explicación del juego">
+      ?
+    </button>
   </div>
 
   <div class="min-h-screen flex flex-col">
@@ -118,7 +120,6 @@
 
           <!-- Botones -->
           <div class="control buttons md:col-span-3 mt-1 flex flex-col gap-3">
-
             <button id="btnComenzar"
                     type="button"
                     class="btn principal w-full rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-extrabold py-3 text-lg shadow-md transition">
@@ -138,9 +139,7 @@
                     class="btn texto self-start text-sm text-slate-500 hover:text-slate-700 underline-offset-4 hover:underline">
               Pausar
             </button>
-
           </div>
-
         </div>
 
         <!-- Juego -->
@@ -166,7 +165,9 @@
           <div class="progreso mt-6" aria-label="Progreso de la sesión">
             <div class="progreso-header flex items-center justify-between text-xs sm:text-sm text-slate-500 mb-2">
               <span id="progTxt">0/0</span>
-              <span class="aciertos">Aciertos: <strong id="aciertos" class="font-bold">0</strong></span>
+              <span class="aciertos">
+                Aciertos: <strong id="aciertos" class="font-bold">0</strong>
+              </span>
             </div>
             <div class="progreso-bar h-2 rounded-full bg-slate-200 overflow-hidden">
               <div id="pbFill" class="h-full w-0 bg-lime-400 transition-[width] duration-300 ease-out"></div>
@@ -184,26 +185,20 @@
             </div>
           </div>
 
-          <!-- Acciones finales -->
+          <!-- Acciones finales (rellenadas por JS) -->
           <div id="finalActions"
                class="final-actions mt-6 flex flex-col gap-3 items-stretch sm:items-center"
-               hidden>
-               
-            <button id="btnOtroJuego"
-                    type="button"
-                    class="btn principal w-full rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-extrabold py-3 text-base shadow-md transition"
-                    hidden>
-              Elegir otro juego
-            </button>
-
-          </div>
+               hidden></div>
 
           <div id="sr-updates" class="sr-only" aria-live="polite"></div>
         </section>
 
         <!-- Footer -->
         <footer class="page-footer py-4 text-center text-[11px] sm:text-xs text-slate-400">
-          Desarrollado por <a href="https://falltem.org/" target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-slate-700">FALLTEM</a>
+          Desarrollado por
+          <a href="https://falltem.org/" target="_blank" rel="noopener noreferrer" class="font-semibold text-slate-500 hover:text-slate-700">
+            FALLTEM
+          </a>
           · Código abierto MIT · Actividad lúdica; estos juegos no constituyen práctica médica.
         </footer>
       </section>
@@ -219,60 +214,97 @@
 
       <div class="modal-card bg-white rounded-2xl shadow-2xl p-5 sm:p-6 md:p-7 border border-slate-200">
 
-        <header class="modal-header">
-          <h2 id="aboutTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">Cálculo amable</h2>
+        <header class="modal-header flex items-center justify-between gap-3 mb-3 sm:mb-4">
+          <h2 id="aboutTitle" class="text-lg sm:text-xl font-extrabold text-slate-900">
+            Cálculo amable
+          </h2>
           <button id="aboutCloseX"
                   class="modal-close text-slate-400 hover:text-slate-600 text-lg"
                   type="button"
-                  aria-label="Cerrar explicación">✕</button>
+                  aria-label="Cerrar explicación">
+            ✕
+          </button>
         </header>
 
-        <div class="modal-tabs">
-          <button id="tab-porques"
-                  class="tab-btn tab-btn--active pb-2 text-sm sm:text-base font-semibold border-b-2 border-lime-400 text-slate-900"
-                  type="button">¿Por qué este juego?</button>
+        <!-- Tabs: primero "Cómo se juega" -->
+        <div class="modal-tabs flex gap-4 border-b border-slate-200 mb-4">
           <button id="tab-como"
+                  class="tab-btn tab-btn--active pb-2 text-sm sm:text-base font-semibold border-b-2 border-lime-400 text-slate-900"
+                  type="button">
+            ¿Cómo se juega?
+          </button>
+          <button id="tab-porques"
                   class="tab-btn pb-2 text-sm sm:text-base font-semibold border-b-2 border-transparent text-slate-500 hover:text-slate-700"
-                  type="button">¿Cómo se juega?</button>
+                  type="button">
+            ¿Por qué este juego?
+          </button>
         </div>
 
-        <!-- ¿Cómo se juega? -->
-        <section id="content-como" hidden class="space-y-3">
-          <p class="modal-text">El objetivo es resolver operaciones sencillas y elegir la respuesta correcta...</p>
+        <!-- Contenido: Cómo se juega (visible por defecto) -->
+        <section id="content-como" class="space-y-3">
+          <p class="modal-text text-sm sm:text-base text-slate-700">
+            El objetivo es resolver operaciones sencillas y elegir la respuesta correcta
+            entre cuatro opciones. Cada ronda tiene un tiempo aproximado, pero podés jugar
+            con tranquilidad.
+          </p>
 
-          <ol class="modal-list modal-list--ordered">
-            <li>Elegí la operación, la dificultad y la cantidad de rondas.</li>
-            <li>Presioná el botón “Comenzar”.</li>
-            <li>Leé la operación.</li>
-            <li>Seleccioná una de las 4 respuestas.</li>
-            <li>Si se termina el tiempo, pasás a la siguiente.</li>
-            <li>Al finalizar, verás tu resultado.</li>
+          <ol class="modal-list modal-list--ordered list-decimal list-inside text-sm sm:text-base text-slate-700 space-y-1">
+            <li>Elegí la <strong>operación</strong>, la <strong>dificultad</strong> y la cantidad de <strong>rondas</strong>.</li>
+            <li>Presioná el botón <strong>“Comenzar”</strong>.</li>
+            <li>Leé la operación (por ejemplo: <em>7 + 5 = ?</em>).</li>
+            <li>Seleccioná una de las 4 respuestas. Podés usar el mouse o el teclado (A–D o 1–4).</li>
+            <li>Si el tiempo se termina, se muestra la respuesta correcta y pasás a la siguiente.</li>
+            <li>Al finalizar, vas a ver tu resultado y una recomendación para seguir practicando.</li>
           </ol>
 
-          <p class="modal-note">Consejo: si te cuesta, reducí rondas o dificultad…</p>
+          <p class="modal-note text-[11px] text-slate-500">
+            Consejo: si sentís que te cuesta, probá con <strong>menos rondas</strong> o una
+            <strong>dificultad más fácil</strong>. Siempre podés volver a intentarlo.
+          </p>
         </section>
 
-        <!-- ¿Por qué este juego? -->
-        <section id="content-porques" class="space-y-3">
-          <p class="modal-text">Este ejercicio estimula cálculo básico, atención y velocidad de procesamiento…</p>
-          <p class="modal-note">Actividad lúdica: no es práctica médica.</p>
-          <p class="modal-version"><small id="versionLabel"></small></p>
+        <!-- Contenido: ¿Por qué este juego? (oculto al inicio) -->
+        <section id="content-porques" class="space-y-3" hidden>
+          <p class="modal-text text-sm sm:text-base text-slate-700">
+            Este ejercicio estimula <strong>cálculo básico</strong>,
+            <strong>atención</strong> y <strong>velocidad de procesamiento</strong>,
+            habilidades cognitivas importantes para mantener la mente activa.
+            Realizar operaciones simples con un tiempo moderado ayuda a entrenar la
+            rapidez para resolver problemas y sostener la concentración
+            (<a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4055506/"
+                target="_blank" rel="noopener noreferrer">Kable et al., 2014</a>).
+          </p>
+
+          <p class="modal-text text-sm sm:text-base text-slate-700">
+            Además, elegir entre cuatro opciones trabaja
+            <strong>toma de decisiones</strong>, <strong>selección visual</strong> y
+            <strong>memoria de trabajo</strong>. La práctica frecuente —aunque sean
+            sesiones breves— puede generar mejoras graduales en estas habilidades.
+          </p>
+
+          <p class="modal-note text-[11px] text-slate-500">
+            ℹ️ <strong>Actividad lúdica:</strong> estos juegos no constituyen
+            práctica médica ni reemplazan evaluación profesional. FALLTEM no
+            recolecta datos personales.
+          </p>
+
+          <p class="modal-version text-[11px] text-slate-400">
+            Versión 1.9.2 — UI unificada
+          </p>
         </section>
 
-        <div class="modal-actions mt-5">
+        <div class="modal-actions mt-5 flex justify-end">
           <button id="aboutClose"
                   class="btn principal rounded-full bg-lime-400 hover:bg-lime-500 text-slate-900 font-bold py-2.5 px-6 text-sm shadow-md transition"
                   type="button">
             Entendido
           </button>
         </div>
-
       </div>
     </div>
   </div>
 
   <!-- JS -->
   <script src="app.js?v=1.9.2" defer></script>
-
 </body>
 </html>
