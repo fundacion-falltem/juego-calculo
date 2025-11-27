@@ -708,8 +708,8 @@ document.addEventListener('DOMContentLoaded', () => {
     aboutModal.hidden = false;
     aboutModal.setAttribute('aria-hidden', 'false');
     aboutBtn?.setAttribute('aria-expanded', 'true');
-    // Siempre arrancamos en la pestaña "¿Por qué este juego?"
-    activarTab('porques');
+    // Ahora arrancamos en "¿Cómo se juega?"
+    activarTab('como');
     aboutClose?.focus();
   }
 
